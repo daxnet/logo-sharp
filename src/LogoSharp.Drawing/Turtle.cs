@@ -50,6 +50,7 @@ namespace LogoSharp.Drawing
         
             this.drawingImage = new Bitmap(this.control.ClientSize.Width, this.control.ClientSize.Height);
             this.drawingGraphics = Graphics.FromImage(this.drawingImage);
+            
             this.drawingGraphics.SmoothingMode = SmoothingMode.AntiAlias;
         }
 
@@ -116,8 +117,7 @@ namespace LogoSharp.Drawing
             var toX = (int)(this.Position.X + steps * Math.Cos(this.Angle * Math.PI / 180));
             var toY = (int)(this.Position.Y + steps * Math.Sin(this.Angle * Math.PI / 180));
 
-            this.drawingGraphics.DrawLine(Pens.Black, WorldPositionToControl(this.control, new Point(fromX, fromY)),
-                WorldPositionToControl(this.control, new Point(toX, toY)));
+            this.DrawLine(this.Position, new Point(toX, toY));
 
             this.Position = new Point(toX, toY);
         }
@@ -144,6 +144,19 @@ namespace LogoSharp.Drawing
             this.turtlePicture.Image = RotateImage(this.turtleImage, this.angle);
             this.turtlePicture.Width = this.turtlePicture.Image.Width;
             this.turtlePicture.Height = this.turtlePicture.Image.Height;
+        }
+
+        private void DrawLine(Point from, Point to)
+        {
+            using (var pen = new Pen(this.PenColor, 2.0F) { StartCap = LineCap.Round, EndCap = LineCap.Round })
+            {
+                var fromPoint = WorldPositionToControl(this.control, new Point(from.X, from.Y));
+                var toPoint = WorldPositionToControl(this.control, new Point(to.X, to.Y));
+
+                this.drawingGraphics.DrawLine(pen, fromPoint, toPoint);
+
+                this.control.Invalidate();
+            }
         }
 
         private void Dispose(bool disposing)
