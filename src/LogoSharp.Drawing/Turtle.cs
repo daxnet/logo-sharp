@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -67,22 +68,24 @@ namespace LogoSharp.Drawing
 
         public void HideTurtle() => this.ShowHideTurtle(false);
 
-        public Point Position
+        public PointF Position
         {
             get
             {
-                var centerPoint = new Point(this.turtlePicture.Left + this.turtlePicture.Width / 2, this.turtlePicture.Top + this.turtlePicture.Height / 2);
+                var centerPoint = new PointF(this.turtlePicture.Left + this.turtlePicture.Width / 2.0F, 
+                    this.turtlePicture.Top + this.turtlePicture.Height / 2.0F);
+
                 return ControlPositionToWorld(this.control, centerPoint);
             }
             set
             {
                 var centerInControl = WorldPositionToControl(this.control, value);
 
-                var left = centerInControl.X - this.turtlePicture.Width / 2;
-                var top = centerInControl.Y - this.turtlePicture.Height / 2;
+                var left = centerInControl.X - this.turtlePicture.Width / 2.0F;
+                var top = centerInControl.Y - this.turtlePicture.Height / 2.0F;
 
-                this.turtlePicture.Left = left;
-                this.turtlePicture.Top = top;
+                this.turtlePicture.Left = Convert.ToInt32(left);
+                this.turtlePicture.Top = Convert.ToInt32(top);
             }
         }
 
@@ -112,23 +115,23 @@ namespace LogoSharp.Drawing
             this.Rotate();
         }
 
-        public void MoveForward(int steps)
+        public void MoveForward(float steps)
         {
             var fromX = this.Position.X;
             var fromY = this.Position.Y;
 
-            var toX = (int)(this.Position.X + steps * Math.Cos(this.Angle * Math.PI / 180));
-            var toY = (int)(this.Position.Y + steps * Math.Sin(this.Angle * Math.PI / 180));
+            var toX = Convert.ToSingle(this.Position.X + steps * Math.Cos(this.Angle * Math.PI / 180));
+            var toY = Convert.ToSingle(this.Position.Y + steps * Math.Sin(this.Angle * Math.PI / 180));
 
             if (this.PenStatus == PenStatus.Down)
             {
-                this.DrawLine(this.Position, new Point(toX, toY));
+                this.DrawLine(this.Position, new PointF(toX, toY));
             }
 
-            this.Position = new Point(toX, toY);
+            this.Position = new PointF(toX, toY);
         }
 
-        public void MoveBackward(int steps) => this.MoveForward(-steps);
+        public void MoveBackward(float steps) => this.MoveForward(-steps);
 
         public void SetPenColor(Color color) => this.penColor = color;
 
@@ -160,12 +163,12 @@ namespace LogoSharp.Drawing
             this.turtlePicture.Height = this.turtlePicture.Image.Height;
         }
 
-        private void DrawLine(Point from, Point to)
+        private void DrawLine(PointF from, PointF to)
         {
-            using (var pen = new Pen(this.penColor, 2.0F) { StartCap = LineCap.Round, EndCap = LineCap.Round })
+            using (var pen = new Pen(this.penColor, this.penWidth) { StartCap = LineCap.Round, EndCap = LineCap.Round })
             {
-                var fromPoint = WorldPositionToControl(this.control, new Point(from.X, from.Y));
-                var toPoint = WorldPositionToControl(this.control, new Point(to.X, to.Y));
+                var fromPoint = WorldPositionToControl(this.control, from);
+                var toPoint = WorldPositionToControl(this.control, to);
 
                 this.drawingGraphics.DrawLine(pen, fromPoint, toPoint);
 
@@ -204,21 +207,21 @@ namespace LogoSharp.Drawing
             }
         }
 
-        private static Point WorldPositionToControl(Control control, Point original)
+        private static PointF WorldPositionToControl(Control control, PointF original)
         {
             var w = control.ClientSize.Width;
             var h = control.ClientSize.Height;
 
-            var translatedX = original.X > w ? original.X % w : original.X;
-            var translatedY = original.Y > h ? original.Y % h : original.Y;
+            //var translatedX = original.X > w ? original.X % w : original.X;
+            //var translatedY = original.Y > h ? original.Y % h : original.Y;
 
-            return new Point(w / 2 + translatedX, h / 2 - translatedY);
+            return new PointF(w / 2.0F + original.X, h / 2.0F - original.Y);
         }
 
-        private static Point ControlPositionToWorld(Control control, Point original)
+        private static PointF ControlPositionToWorld(Control control, PointF original)
         {
-            return new Point(original.X - control.ClientSize.Width / 2,
-                control.ClientSize.Height / 2 - original.Y);
+            return new PointF(original.X - control.ClientSize.Width / 2.0F,
+                control.ClientSize.Height / 2.0F - original.Y);
         }
 
         private static Bitmap RotateImage(Image bmp, float angleDegrees)
@@ -227,13 +230,13 @@ namespace LogoSharp.Drawing
             using (var g = Graphics.FromImage(rotatedImage))
             {
                 // Set the rotation point as the center into the matrix
-                g.TranslateTransform(bmp.Width / 2, bmp.Height / 2);
+                g.TranslateTransform(bmp.Width / 2.0F, bmp.Height / 2.0F);
 
                 // Rotate
                 g.RotateTransform(90 - angleDegrees);
 
                 // Restore the rotation point into the matrix
-                g.TranslateTransform(-bmp.Width / 2, -bmp.Height / 2);
+                g.TranslateTransform(-bmp.Width / 2.0F, -bmp.Height / 2.0F);
 
                 // Draw the image on the new bitmap
                 g.DrawImage(bmp, new Point(0, 0));

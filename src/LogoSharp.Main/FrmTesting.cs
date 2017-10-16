@@ -14,13 +14,51 @@ namespace LogoSharp.Main
     public partial class FrmTesting : Form
     {
         private readonly Turtle turtle;
+        private readonly Logo logo = new Logo();
 
         public FrmTesting()
         {
             InitializeComponent();
             this.turtle = new Turtle(this.pnlMain);
+            this.turtle.SetPenWidth(2.0F);
             this.turtle.Reset();
             this.lblColor.BackColor = this.turtle.PenColor;
+
+            logo.TurnLeft += (s, e) =>
+              {
+                  this.turtle.Left(e.Angle);
+              };
+
+            logo.TurnRight += (s, e) =>
+              {
+                  this.turtle.Right(e.Angle);
+              };
+
+            logo.Forward += (s, e) =>
+              {
+                  this.turtle.MoveForward(e.Steps);
+              };
+
+            logo.Backward += (s, e) =>
+              {
+                  this.turtle.MoveBackward(e.Steps);
+              };
+
+            logo.PenUp += (s, e) =>
+              {
+                  this.turtle.PenStatus = PenStatus.Up;
+              };
+
+            logo.PenDown += (s, e) =>
+             {
+                 this.turtle.PenStatus = PenStatus.Down;
+             };
+
+            logo.SetPenColor += (s, e) =>
+              {
+                  lblColor.BackColor = Color.FromArgb(e.R, e.G, e.B);
+                  this.turtle.SetPenColor(e.R, e.G, e.B);
+              };
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -98,10 +136,9 @@ namespace LogoSharp.Main
                 sourceCode += Environment.NewLine;
             }
 
-            var logo = new Logo();
             try
             {
-                logo.Execute(sourceCode);
+                this.logo.Execute(sourceCode);
                 txtError.Text = string.Empty;
             }
             catch(ParsingException pex)

@@ -50,13 +50,13 @@
             this.btnPenDown = new System.Windows.Forms.Button();
             this.btnPenUp = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
+            this.tpProgram = new System.Windows.Forms.TabPage();
+            this.txtError = new System.Windows.Forms.TextBox();
+            this.btnExecute = new System.Windows.Forms.Button();
+            this.txtSourceCode = new System.Windows.Forms.TextBox();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.tpProgram = new System.Windows.Forms.TabPage();
-            this.txtSourceCode = new System.Windows.Forms.TextBox();
-            this.btnExecute = new System.Windows.Forms.Button();
-            this.txtError = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -113,7 +113,7 @@
             this.tabPage2.Location = new System.Drawing.Point(23, 4);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(217, 742);
+            this.tabPage2.Size = new System.Drawing.Size(217, 681);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Turtle";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -281,7 +281,7 @@
             this.tpDrawing.Location = new System.Drawing.Point(23, 4);
             this.tpDrawing.Name = "tpDrawing";
             this.tpDrawing.Padding = new System.Windows.Forms.Padding(3);
-            this.tpDrawing.Size = new System.Drawing.Size(217, 742);
+            this.tpDrawing.Size = new System.Drawing.Size(217, 681);
             this.tpDrawing.TabIndex = 2;
             this.tpDrawing.Text = "Drawing";
             this.tpDrawing.UseVisualStyleBackColor = true;
@@ -346,6 +346,57 @@
             this.btnClear.UseVisualStyleBackColor = true;
             this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
+            // tpProgram
+            // 
+            this.tpProgram.Controls.Add(this.txtError);
+            this.tpProgram.Controls.Add(this.btnExecute);
+            this.tpProgram.Controls.Add(this.txtSourceCode);
+            this.tpProgram.Location = new System.Drawing.Point(23, 4);
+            this.tpProgram.Name = "tpProgram";
+            this.tpProgram.Padding = new System.Windows.Forms.Padding(3);
+            this.tpProgram.Size = new System.Drawing.Size(217, 681);
+            this.tpProgram.TabIndex = 3;
+            this.tpProgram.Text = "Program";
+            this.tpProgram.UseVisualStyleBackColor = true;
+            // 
+            // txtError
+            // 
+            this.txtError.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtError.Location = new System.Drawing.Point(6, 502);
+            this.txtError.Multiline = true;
+            this.txtError.Name = "txtError";
+            this.txtError.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtError.Size = new System.Drawing.Size(205, 171);
+            this.txtError.TabIndex = 2;
+            this.txtError.WordWrap = false;
+            // 
+            // btnExecute
+            // 
+            this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExecute.Location = new System.Drawing.Point(136, 474);
+            this.btnExecute.Name = "btnExecute";
+            this.btnExecute.Size = new System.Drawing.Size(75, 23);
+            this.btnExecute.TabIndex = 1;
+            this.btnExecute.Text = "Execute";
+            this.btnExecute.UseVisualStyleBackColor = true;
+            this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
+            // 
+            // txtSourceCode
+            // 
+            this.txtSourceCode.AcceptsReturn = true;
+            this.txtSourceCode.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtSourceCode.Location = new System.Drawing.Point(6, 8);
+            this.txtSourceCode.Multiline = true;
+            this.txtSourceCode.Name = "txtSourceCode";
+            this.txtSourceCode.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtSourceCode.Size = new System.Drawing.Size(205, 460);
+            this.txtSourceCode.TabIndex = 0;
+            this.txtSourceCode.Text = "LT 72\r\nFD 90\r\nLT 72\r\nFD 90\r\nLT 72\r\nFD 90\r\nLT 72\r\nFD 90\r\nLT 72\r\nFD 90\r\n";
+            this.txtSourceCode.WordWrap = false;
+            // 
             // pnlMain
             // 
             this.pnlMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -363,57 +414,6 @@
             this.timer1.Enabled = true;
             this.timer1.Interval = 500;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // tpProgram
-            // 
-            this.tpProgram.Controls.Add(this.txtError);
-            this.tpProgram.Controls.Add(this.btnExecute);
-            this.tpProgram.Controls.Add(this.txtSourceCode);
-            this.tpProgram.Location = new System.Drawing.Point(23, 4);
-            this.tpProgram.Name = "tpProgram";
-            this.tpProgram.Padding = new System.Windows.Forms.Padding(3);
-            this.tpProgram.Size = new System.Drawing.Size(217, 681);
-            this.tpProgram.TabIndex = 3;
-            this.tpProgram.Text = "Program";
-            this.tpProgram.UseVisualStyleBackColor = true;
-            // 
-            // txtSourceCode
-            // 
-            this.txtSourceCode.AcceptsReturn = true;
-            this.txtSourceCode.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSourceCode.Location = new System.Drawing.Point(6, 8);
-            this.txtSourceCode.Multiline = true;
-            this.txtSourceCode.Name = "txtSourceCode";
-            this.txtSourceCode.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtSourceCode.Size = new System.Drawing.Size(205, 460);
-            this.txtSourceCode.TabIndex = 0;
-            this.txtSourceCode.Text = "LT 72\r\nFD 90";
-            this.txtSourceCode.WordWrap = false;
-            // 
-            // btnExecute
-            // 
-            this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExecute.Location = new System.Drawing.Point(136, 474);
-            this.btnExecute.Name = "btnExecute";
-            this.btnExecute.Size = new System.Drawing.Size(75, 23);
-            this.btnExecute.TabIndex = 1;
-            this.btnExecute.Text = "Execute";
-            this.btnExecute.UseVisualStyleBackColor = true;
-            this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
-            // 
-            // txtError
-            // 
-            this.txtError.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtError.Location = new System.Drawing.Point(6, 502);
-            this.txtError.Multiline = true;
-            this.txtError.Name = "txtError";
-            this.txtError.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtError.Size = new System.Drawing.Size(205, 171);
-            this.txtError.TabIndex = 2;
-            this.txtError.WordWrap = false;
             // 
             // FrmTesting
             // 

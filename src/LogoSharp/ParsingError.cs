@@ -26,7 +26,7 @@ namespace LogoSharp
 
         public override string ToString()
         {
-            return $"(Pos: {Position}, Line: {Line}, Col: {Column}) - {Message}";
+            return $"(Pos: {Position}, Line: {Line + 1}, Col: {Column + 1}) - {Message}";
         }
     }
 }

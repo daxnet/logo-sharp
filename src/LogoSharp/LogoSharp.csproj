@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="EventArguments\BackwardEventArgs.cs" />
     <Compile Include="EventArguments\ForwardEventArgs.cs" />
+    <Compile Include="EventArguments\PenColorEventArgs.cs" />
     <Compile Include="Logo.cs" />
     <Compile Include="LogoGrammar.cs" />
     <Compile Include="ParsingError.cs" />
