@@ -44,15 +44,19 @@
             this.btnTurnLeft = new System.Windows.Forms.Button();
             this.numAngle = new System.Windows.Forms.NumericUpDown();
             this.tpDrawing = new System.Windows.Forms.TabPage();
+            this.btnChoose = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblColor = new System.Windows.Forms.Label();
             this.btnPenDown = new System.Windows.Forms.Button();
             this.btnPenUp = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.lblColor = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.btnChoose = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.tpProgram = new System.Windows.Forms.TabPage();
+            this.txtSourceCode = new System.Windows.Forms.TextBox();
+            this.btnExecute = new System.Windows.Forms.Button();
+            this.txtError = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -64,6 +68,7 @@
             this.grpDirection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numAngle)).BeginInit();
             this.tpDrawing.SuspendLayout();
+            this.tpProgram.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer
@@ -80,7 +85,7 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.pnlMain);
-            this.splitContainer.Size = new System.Drawing.Size(966, 750);
+            this.splitContainer.Size = new System.Drawing.Size(966, 689);
             this.splitContainer.SplitterDistance = 244;
             this.splitContainer.TabIndex = 0;
             // 
@@ -89,12 +94,13 @@
             this.tabControl.Alignment = System.Windows.Forms.TabAlignment.Left;
             this.tabControl.Controls.Add(this.tabPage2);
             this.tabControl.Controls.Add(this.tpDrawing);
+            this.tabControl.Controls.Add(this.tpProgram);
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Multiline = true;
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(244, 750);
+            this.tabControl.Size = new System.Drawing.Size(244, 689);
             this.tabControl.TabIndex = 0;
             // 
             // tabPage2
@@ -280,6 +286,33 @@
             this.tpDrawing.Text = "Drawing";
             this.tpDrawing.UseVisualStyleBackColor = true;
             // 
+            // btnChoose
+            // 
+            this.btnChoose.Location = new System.Drawing.Point(90, 79);
+            this.btnChoose.Name = "btnChoose";
+            this.btnChoose.Size = new System.Drawing.Size(75, 23);
+            this.btnChoose.TabIndex = 5;
+            this.btnChoose.Text = "Choose...";
+            this.btnChoose.UseVisualStyleBackColor = true;
+            this.btnChoose.Click += new System.EventHandler(this.btnChoose_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 84);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(56, 13);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Pen Color:";
+            // 
+            // lblColor
+            // 
+            this.lblColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblColor.Location = new System.Drawing.Point(68, 83);
+            this.lblColor.Name = "lblColor";
+            this.lblColor.Size = new System.Drawing.Size(16, 16);
+            this.lblColor.TabIndex = 3;
+            // 
             // btnPenDown
             // 
             this.btnPenDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -322,7 +355,7 @@
             this.pnlMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlMain.Location = new System.Drawing.Point(13, 12);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(693, 726);
+            this.pnlMain.Size = new System.Drawing.Size(693, 665);
             this.pnlMain.TabIndex = 1;
             // 
             // timer1
@@ -331,38 +364,62 @@
             this.timer1.Interval = 500;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // lblColor
+            // tpProgram
             // 
-            this.lblColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblColor.Location = new System.Drawing.Point(68, 83);
-            this.lblColor.Name = "lblColor";
-            this.lblColor.Size = new System.Drawing.Size(16, 16);
-            this.lblColor.TabIndex = 3;
+            this.tpProgram.Controls.Add(this.txtError);
+            this.tpProgram.Controls.Add(this.btnExecute);
+            this.tpProgram.Controls.Add(this.txtSourceCode);
+            this.tpProgram.Location = new System.Drawing.Point(23, 4);
+            this.tpProgram.Name = "tpProgram";
+            this.tpProgram.Padding = new System.Windows.Forms.Padding(3);
+            this.tpProgram.Size = new System.Drawing.Size(217, 681);
+            this.tpProgram.TabIndex = 3;
+            this.tpProgram.Text = "Program";
+            this.tpProgram.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // txtSourceCode
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 84);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Pen Color:";
+            this.txtSourceCode.AcceptsReturn = true;
+            this.txtSourceCode.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtSourceCode.Location = new System.Drawing.Point(6, 8);
+            this.txtSourceCode.Multiline = true;
+            this.txtSourceCode.Name = "txtSourceCode";
+            this.txtSourceCode.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtSourceCode.Size = new System.Drawing.Size(205, 460);
+            this.txtSourceCode.TabIndex = 0;
+            this.txtSourceCode.Text = "LT 72\r\nFD 90";
+            this.txtSourceCode.WordWrap = false;
             // 
-            // btnChoose
+            // btnExecute
             // 
-            this.btnChoose.Location = new System.Drawing.Point(90, 79);
-            this.btnChoose.Name = "btnChoose";
-            this.btnChoose.Size = new System.Drawing.Size(75, 23);
-            this.btnChoose.TabIndex = 5;
-            this.btnChoose.Text = "Choose...";
-            this.btnChoose.UseVisualStyleBackColor = true;
-            this.btnChoose.Click += new System.EventHandler(this.btnChoose_Click);
+            this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExecute.Location = new System.Drawing.Point(136, 474);
+            this.btnExecute.Name = "btnExecute";
+            this.btnExecute.Size = new System.Drawing.Size(75, 23);
+            this.btnExecute.TabIndex = 1;
+            this.btnExecute.Text = "Execute";
+            this.btnExecute.UseVisualStyleBackColor = true;
+            this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
+            // 
+            // txtError
+            // 
+            this.txtError.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtError.Location = new System.Drawing.Point(6, 502);
+            this.txtError.Multiline = true;
+            this.txtError.Name = "txtError";
+            this.txtError.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtError.Size = new System.Drawing.Size(205, 171);
+            this.txtError.TabIndex = 2;
+            this.txtError.WordWrap = false;
             // 
             // FrmTesting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(966, 750);
+            this.ClientSize = new System.Drawing.Size(966, 689);
             this.Controls.Add(this.splitContainer);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -380,6 +437,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numAngle)).EndInit();
             this.tpDrawing.ResumeLayout(false);
             this.tpDrawing.PerformLayout();
+            this.tpProgram.ResumeLayout(false);
+            this.tpProgram.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -410,6 +469,10 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnChoose;
         private System.Windows.Forms.ColorDialog colorDialog1;
+        private System.Windows.Forms.TabPage tpProgram;
+        private System.Windows.Forms.Button btnExecute;
+        private System.Windows.Forms.TextBox txtSourceCode;
+        private System.Windows.Forms.TextBox txtError;
     }
 }
 

@@ -46,11 +46,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventArguments\BackwardEventArgs.cs" />
+    <Compile Include="EventArguments\ForwardEventArgs.cs" />
+    <Compile Include="Logo.cs" />
     <Compile Include="LogoGrammar.cs" />
+    <Compile Include="ParsingError.cs" />
+    <Compile Include="ParsingException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EventArguments\TurnLeftEventArgs.cs" />
+    <Compile Include="EventArguments\TurnRightEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

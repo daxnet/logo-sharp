@@ -89,5 +89,25 @@ namespace LogoSharp.Main
                 this.turtle.SetPenColor(colorDialog1.Color);
             }
         }
+
+        private void btnExecute_Click(object sender, EventArgs e)
+        {
+            var sourceCode = txtSourceCode.Text;
+            if (!sourceCode.EndsWith(Environment.NewLine))
+            {
+                sourceCode += Environment.NewLine;
+            }
+
+            var logo = new Logo();
+            try
+            {
+                logo.Execute(sourceCode);
+                txtError.Text = string.Empty;
+            }
+            catch(ParsingException pex)
+            {
+                txtError.Text = string.Join(Environment.NewLine, pex.ParsingErrors.Select(x => x.ToString()));
+            }
+        }
     }
 }
