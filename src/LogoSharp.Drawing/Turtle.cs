@@ -100,7 +100,7 @@ namespace LogoSharp.Drawing
         {
             this.drawingGraphics.Clear(Color.White);
             this.Reset();
-            this.control.Invalidate();
+            this.InvalidateControl();
         }
 
         public void Right(float degree)
@@ -123,12 +123,13 @@ namespace LogoSharp.Drawing
             var toX = Convert.ToSingle(this.Position.X + steps * Math.Cos(this.Angle * Math.PI / 180));
             var toY = Convert.ToSingle(this.Position.Y + steps * Math.Sin(this.Angle * Math.PI / 180));
 
+            var origPosition = this.Position;
+            this.Position = new PointF(toX, toY);
+
             if (this.PenStatus == PenStatus.Down)
             {
-                this.DrawLine(this.Position, new PointF(toX, toY));
+                this.DrawLine(origPosition, new PointF(toX, toY));
             }
-
-            this.Position = new PointF(toX, toY);
         }
 
         public void MoveBackward(float steps) => this.MoveForward(-steps);
@@ -172,7 +173,7 @@ namespace LogoSharp.Drawing
 
                 this.drawingGraphics.DrawLine(pen, fromPoint, toPoint);
 
-                this.control.Invalidate();
+                this.InvalidateControl();
             }
         }
 
@@ -191,6 +192,18 @@ namespace LogoSharp.Drawing
                 {
                     this.drawingImage.Dispose();
                 }
+            }
+        }
+
+        private void InvalidateControl(int delayMilliseconds = 200)
+        {
+            this.control.Invalidate();
+            if (delayMilliseconds != 0)
+            {
+                this.control.Update();
+                Thread.Sleep(delayMilliseconds);
+                this.control.Invalidate();
+                Application.DoEvents();
             }
         }
 

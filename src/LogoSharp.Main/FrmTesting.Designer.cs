@@ -394,7 +394,7 @@
             this.txtSourceCode.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtSourceCode.Size = new System.Drawing.Size(205, 460);
             this.txtSourceCode.TabIndex = 0;
-            this.txtSourceCode.Text = "LT 72\r\nFD 90\r\nLT 72\r\nFD 90\r\nLT 72\r\nFD 90\r\nLT 72\r\nFD 90\r\nLT 72\r\nFD 90\r\n";
+            this.txtSourceCode.Text = "REPEAT 5[FD 100 RT 144]\r\n\r\n";
             this.txtSourceCode.WordWrap = false;
             // 
             // pnlMain

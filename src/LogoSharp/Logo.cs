@@ -55,6 +55,9 @@ namespace LogoSharp
                 case "PEN_COMMAND":
                     this.ParsePenCommand(node);
                     break;
+                case "REPEAT_COMMAND":
+                    this.ParseRepeatCommand(node);
+                    break;
             }
         }
 
@@ -93,8 +96,8 @@ namespace LogoSharp
                     this.OnPenDown(EventArgs.Empty);
                     break;
                 case "SET_PEN_COLOR":
-                    List<float> rgb = new List<float>();
-                    ParseTupleArgs(commandNode.ChildNodes[1], rgb);
+                    var rgb = new List<float>();
+                    ParseTupleValues(commandNode.ChildNodes[1], rgb);
                     if (rgb.Count != 3)
                     {
                         throw new ParsingException("Incorrect command invocation.", new[]
@@ -103,23 +106,41 @@ namespace LogoSharp
                         });
                     }
 
+                    if (rgb.Any(v => v < 0 || v > 255))
+                    {
+                        throw new ParsingException("Command parameters are out of range.", new[]
+                        {
+                            new ParsingError(node.Span.Location.Position, node.Span.Location.Column, node.Span.Location.Line, "The parameter value should be greater than or equal to 0 and less than or equal to 255.")
+                        });
+                    }
+
                     this.OnSetPenColor(new PenColorEventArgs(Convert.ToInt32(rgb[0]), Convert.ToInt32(rgb[1]), Convert.ToInt32(rgb[2])));
                     break;
             }
         }
 
-        private void ParseTupleArgs(ParseTreeNode tupleArgs, List<float> result)
+        private void ParseRepeatCommand(ParseTreeNode repeatNode)
         {
-            foreach (var child in tupleArgs.ChildNodes)
+            if (repeatNode.ChildNodes[2]?.ChildNodes?.Count == 0)
             {
-                if (child.Term.Name == "TUPLE")
+                return;
+            }
+
+            var repeatCount = Convert.ToInt32(repeatNode.ChildNodes[1].Token.Value);
+            for (var i = 0; i < repeatCount; i++)
+            {
+                foreach (var childNode in repeatNode.ChildNodes[2].ChildNodes)
                 {
-                    ParseTupleArgs(child, result);
+                    this.ParseTree(childNode);
                 }
-                else
-                {
-                    result.Add(Convert.ToSingle(child.Token.Value));
-                }
+            }
+        }
+
+        private void ParseTupleValues(ParseTreeNode tupleNode, List<float> result)
+        {
+            foreach (var child in tupleNode.ChildNodes)
+            {
+                result.Add(Convert.ToSingle(child.Token.Value));
             }
         }
 

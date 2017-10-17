@@ -54,7 +54,15 @@ namespace LogoSharp
             var FILL = new NonTerminal("FILL");
             var PEN_COMMAND = new NonTerminal("PEN_COMMAND");
 
-            // 50. Final command
+            var BASIC_COMMAND = new NonTerminal("BASIC_COMMAND");
+
+            // 50. Flow Controls
+            var REPEAT_COMMAND = new NonTerminal("REPEAT_COMMAND");
+            var REPEAT_BODY = new NonTerminal("REPEAT_BODY");
+
+            var FLOW_CONTROL_COMMAND = new NonTerminal("FLOW_CONTROL_COMMAND");
+
+            // 60. Final command
             var COMMAND_LINE = new NonTerminal("COMMAND_LINE");
             var COMMAND = new NonTerminal("COMMAND");
 
@@ -62,7 +70,8 @@ namespace LogoSharp
             RSB.Rule = ToTerm("]");
 
             TUPLE_ELEMENT.Rule = integer_number | decimal_number;
-            TUPLE.Rule = TUPLE + TUPLE_ELEMENT | TUPLE_ELEMENT; // Simply using TUPLE | TUPLE_ELEMENT will result in conflicts.
+            // TUPLE.Rule = TUPLE + TUPLE_ELEMENT | TUPLE_ELEMENT; // Simply using TUPLE | TUPLE_ELEMENT will result in conflicts.
+            TUPLE.Rule = MakeStarRule(TUPLE, TUPLE_ELEMENT);
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
             LT.Rule = ToTerm("LT") | ToTerm("LEFT");
@@ -87,7 +96,14 @@ namespace LogoSharp
             FILL.Rule = ToTerm("FILL");
             PEN_COMMAND.Rule = PEN_DOWN | PEN_UP | SET_PEN_COLOR | SET_PEN_SIZE | PE | PN | SET_FLOOD_COLOR | FILL;
 
-            COMMAND_LINE.Rule = DRAWING_COMMAND | PEN_COMMAND | Empty;
+            // REPEAT_BODY.Rule = REPEAT_BODY + BASIC_COMMAND | BASIC_COMMAND;
+            REPEAT_BODY.Rule = MakeStarRule(REPEAT_BODY, BASIC_COMMAND);
+            REPEAT_COMMAND.Rule = ToTerm("REPEAT") + integer_number + LSB + REPEAT_BODY + RSB;
+
+            BASIC_COMMAND.Rule = DRAWING_COMMAND | PEN_COMMAND;
+            FLOW_CONTROL_COMMAND.Rule = REPEAT_COMMAND;
+
+            COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND | Empty;
             COMMAND.Rule = COMMAND_LINE + NewLine;
             PROGRAM.Rule = MakePlusRule(PROGRAM, COMMAND);
 
@@ -97,7 +113,8 @@ namespace LogoSharp
 
             RegisterBracePair("[", "]");
             MarkPunctuation(LSB, RSB);
-            MarkTransient(COMMAND, COMMAND_LINE, TUPLE_ELEMENT);
+
+            MarkTransient(COMMAND, COMMAND_LINE, BASIC_COMMAND, FLOW_CONTROL_COMMAND, TUPLEARGS, TUPLE_ELEMENT);
 
             this.Root = PROGRAM;
         }
