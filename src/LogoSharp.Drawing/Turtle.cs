@@ -21,6 +21,7 @@ namespace LogoSharp.Drawing
         private float angle = 90F;
         private Color penColor = Color.Black;
         private float penWidth = 1.0F;
+        private int delayMilliseconds = 100;
 
         ~Turtle()
         {
@@ -140,6 +141,8 @@ namespace LogoSharp.Drawing
 
         public void SetPenWidth(float width) => this.penWidth = width;
 
+        public void SetDelayMilliseconds(int milliseconds) => this.delayMilliseconds = milliseconds;
+
         public override string ToString()
         {
             return $"Position: {this.Position}, Angle: {this.Angle}, PenStatus: {this.PenStatus}";
@@ -156,6 +159,8 @@ namespace LogoSharp.Drawing
         public Color PenColor => this.penColor;
 
         public float PenWidth => this.penWidth;
+
+        public float DelayMilliseconds => this.delayMilliseconds;
 
         private void Rotate()
         {
@@ -195,7 +200,7 @@ namespace LogoSharp.Drawing
             }
         }
 
-        private void InvalidateControl(int delayMilliseconds = 200)
+        private void InvalidateControl()
         {
             this.control.Invalidate();
             if (delayMilliseconds != 0)

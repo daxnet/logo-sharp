@@ -59,6 +59,16 @@ namespace LogoSharp.Main
                   lblColor.BackColor = Color.FromArgb(e.R, e.G, e.B);
                   this.turtle.SetPenColor(e.R, e.G, e.B);
               };
+
+            logo.Delay += (s, e) =>
+              {
+                  this.turtle.SetDelayMilliseconds(e.Milliseconds);
+              };
+
+            logo.ClearScreen += (s, e) =>
+              {
+                  this.turtle.Clear();
+              };
         }
 
         private void timer1_Tick(object sender, EventArgs e)

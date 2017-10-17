@@ -19,8 +19,10 @@ namespace LogoSharp
         public event EventHandler<ForwardEventArgs> Forward;
         public event EventHandler<BackwardEventArgs> Backward;
         public event EventHandler<PenColorEventArgs> SetPenColor;
+        public event EventHandler<DelayEventArgs> Delay;
         public event EventHandler PenUp;
         public event EventHandler PenDown;
+        public event EventHandler ClearScreen;
 
         public void Execute(string source)
         {
@@ -64,22 +66,27 @@ namespace LogoSharp
         private void ParseDrawingCommand(ParseTreeNode node)
         {
             var commandNode = node.ChildNodes[0];
-            var commandParameterNode = node.ChildNodes[1];
-            var parameter = Convert.ToSingle(commandParameterNode.Token.Value);
+            
 
             switch (commandNode.Term.Name)
             {
                 case "LEFT":
-                    this.OnTurnLeft(new TurnLeftEventArgs(parameter));
+                    this.OnTurnLeft(new TurnLeftEventArgs(Convert.ToSingle(node.ChildNodes[1].Token.Value)));
                     break;
                 case "RIGHT":
-                    this.OnTurnRight(new TurnRightEventArgs(parameter));
+                    this.OnTurnRight(new TurnRightEventArgs(Convert.ToSingle(node.ChildNodes[1].Token.Value)));
                     break;
                 case "FORWARD":
-                    this.OnForward(new ForwardEventArgs(parameter));
+                    this.OnForward(new ForwardEventArgs(Convert.ToSingle(node.ChildNodes[1].Token.Value)));
                     break;
                 case "BACKWARD":
-                    this.OnBackward(new BackwardEventArgs(parameter));
+                    this.OnBackward(new BackwardEventArgs(Convert.ToSingle(node.ChildNodes[1].Token.Value)));
+                    break;
+                case "DELAY":
+                    this.OnDelay(new DelayEventArgs(Convert.ToInt32(node.ChildNodes[1].Token.Value)));
+                    break;
+                case "DRAW":
+                    this.OnClearScreen(EventArgs.Empty);
                     break;
             }
         }
@@ -177,6 +184,16 @@ namespace LogoSharp
         private void OnSetPenColor(PenColorEventArgs e)
         {
             this.SetPenColor?.Invoke(this, e);
+        }
+
+        private void OnDelay(DelayEventArgs e)
+        {
+            this.Delay?.Invoke(this, e);
+        }
+
+        private void OnClearScreen(EventArgs e)
+        {
+            this.ClearScreen?.Invoke(this, e);
         }
     }
 }

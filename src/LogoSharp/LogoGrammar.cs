@@ -40,6 +40,8 @@ namespace LogoSharp
             var BK = new NonTerminal("BACKWARD");
             var FD = new NonTerminal("FORWARD");
             var ARC = new NonTerminal("ARC");
+            var DELAY = new NonTerminal("DELAY");
+            var DRAW = new NonTerminal("DRAW");
             var DRAWING_COMMAND = new NonTerminal("DRAWING_COMMAND");
 
             // 40. Pen commands
@@ -50,8 +52,6 @@ namespace LogoSharp
             var PEN_UP = new NonTerminal("PEN_UP");
             var SET_PEN_SIZE = new NonTerminal("SET_PEN_SIZE");
             var SET_PEN_COLOR = new NonTerminal("SET_PEN_COLOR");
-            var SET_FLOOD_COLOR = new NonTerminal("SET_FLOOD_COLOR");
-            var FILL = new NonTerminal("FILL");
             var PEN_COMMAND = new NonTerminal("PEN_COMMAND");
 
             var BASIC_COMMAND = new NonTerminal("BASIC_COMMAND");
@@ -79,11 +79,14 @@ namespace LogoSharp
             FD.Rule = ToTerm("FD") | ToTerm("FORWARD");
             BK.Rule = ToTerm("BK") | ToTerm("BACKWARD");
             ARC.Rule = ToTerm("ARC") | ToTerm("ARC2");
+            DELAY.Rule = ToTerm("DELAY");
+            DRAW.Rule = ToTerm("CLS") | ToTerm("DRAW") | ToTerm("CLEARSCR") | ToTerm("CLEARSCREEN");
             DRAWING_COMMAND.Rule = LT + integer_number | 
                 RT + integer_number | 
                 FD + integer_number | 
                 BK + integer_number |
-                ARC + integer_number;
+                ARC + integer_number |
+                DELAY + integer_number | DRAW;
 
             PC.Rule = ToTerm("SETPENCOLOR") | "SETPC" | "PC";
             PE.Rule = ToTerm("PENERASE") | "PE";
@@ -92,20 +95,18 @@ namespace LogoSharp
             PEN_UP.Rule = ToTerm("PU") | "PENUP";
             SET_PEN_SIZE.Rule = ToTerm("SETPENSIZE") + TUPLEARGS;
             SET_PEN_COLOR.Rule = PC + TUPLEARGS;
-            SET_FLOOD_COLOR.Rule = ToTerm("SETFLOODCOLOR") + TUPLEARGS;
-            FILL.Rule = ToTerm("FILL");
-            PEN_COMMAND.Rule = PEN_DOWN | PEN_UP | SET_PEN_COLOR | SET_PEN_SIZE | PE | PN | SET_FLOOD_COLOR | FILL;
+            PEN_COMMAND.Rule = PEN_DOWN | PEN_UP | SET_PEN_COLOR | SET_PEN_SIZE | PE | PN;
 
             // REPEAT_BODY.Rule = REPEAT_BODY + BASIC_COMMAND | BASIC_COMMAND;
-            REPEAT_BODY.Rule = MakeStarRule(REPEAT_BODY, BASIC_COMMAND);
+            REPEAT_BODY.Rule = MakeStarRule(REPEAT_BODY, COMMAND_LINE);
             REPEAT_COMMAND.Rule = ToTerm("REPEAT") + integer_number + LSB + REPEAT_BODY + RSB;
 
             BASIC_COMMAND.Rule = DRAWING_COMMAND | PEN_COMMAND;
             FLOW_CONTROL_COMMAND.Rule = REPEAT_COMMAND;
 
-            COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND | Empty;
-            COMMAND.Rule = COMMAND_LINE + NewLine;
-            PROGRAM.Rule = MakePlusRule(PROGRAM, COMMAND);
+            COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND;
+            COMMAND.Rule = COMMAND_LINE | Empty + NewLine;
+            PROGRAM.Rule = MakePlusRule(PROGRAM, COMMAND); 
 
             RegisterOperators(60, "^");
             RegisterOperators(50, "*", "/");
