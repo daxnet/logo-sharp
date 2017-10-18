@@ -46,6 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Evaluations\BinaryEvaluation.cs" />
+    <Compile Include="Evaluations\BinaryOperation.cs" />
+    <Compile Include="Evaluations\ConstantEvaluation.cs" />
+    <Compile Include="Evaluations\Evaluation.cs" />
+    <Compile Include="Evaluations\FunctionEvaluation.cs" />
     <Compile Include="EventArguments\BackwardEventArgs.cs" />
     <Compile Include="EventArguments\DelayEventArgs.cs" />
     <Compile Include="EventArguments\ForwardEventArgs.cs" />

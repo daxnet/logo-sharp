@@ -1,5 +1,6 @@
 ﻿using Irony;
 using Irony.Parsing;
+using LogoSharp.Evaluations;
 using LogoSharp.EventArguments;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace LogoSharp
     {
         private static readonly LanguageData language = new LanguageData(new LogoGrammar());
         private static readonly Parser parser = new Parser(language);
+        private static readonly Dictionary<string, object> variables = new Dictionary<string, object>();
 
         public event EventHandler<TurnLeftEventArgs> TurnLeft;
         public event EventHandler<TurnRightEventArgs> TurnRight;
@@ -66,24 +68,30 @@ namespace LogoSharp
         private void ParseDrawingCommand(ParseTreeNode node)
         {
             var commandNode = node.ChildNodes[0];
-            
+            ParseTreeNode parameterNode = null;
+            var evaluatedValue = 0F;
+            if (node.ChildNodes.Count > 1)
+            {
+                parameterNode = node.ChildNodes[1];
+                evaluatedValue = EvaluateArithmeticExpression(parameterNode).Value;
+            }
 
             switch (commandNode.Term.Name)
             {
                 case "LEFT":
-                    this.OnTurnLeft(new TurnLeftEventArgs(Convert.ToSingle(node.ChildNodes[1].Token.Value)));
+                    this.OnTurnLeft(new TurnLeftEventArgs(evaluatedValue));
                     break;
                 case "RIGHT":
-                    this.OnTurnRight(new TurnRightEventArgs(Convert.ToSingle(node.ChildNodes[1].Token.Value)));
+                    this.OnTurnRight(new TurnRightEventArgs(evaluatedValue));
                     break;
                 case "FORWARD":
-                    this.OnForward(new ForwardEventArgs(Convert.ToSingle(node.ChildNodes[1].Token.Value)));
+                    this.OnForward(new ForwardEventArgs(evaluatedValue));
                     break;
                 case "BACKWARD":
-                    this.OnBackward(new BackwardEventArgs(Convert.ToSingle(node.ChildNodes[1].Token.Value)));
+                    this.OnBackward(new BackwardEventArgs(evaluatedValue));
                     break;
                 case "DELAY":
-                    this.OnDelay(new DelayEventArgs(Convert.ToInt32(node.ChildNodes[1].Token.Value)));
+                    this.OnDelay(new DelayEventArgs(Convert.ToInt32(evaluatedValue)));
                     break;
                 case "DRAW":
                     this.OnClearScreen(EventArgs.Empty);
@@ -133,7 +141,7 @@ namespace LogoSharp
                 return;
             }
 
-            var repeatCount = Convert.ToInt32(repeatNode.ChildNodes[1].Token.Value);
+            var repeatCount = Convert.ToInt32(EvaluateArithmeticExpression(repeatNode.ChildNodes[1]).Value);
             for (var i = 0; i < repeatCount; i++)
             {
                 foreach (var childNode in repeatNode.ChildNodes[2].ChildNodes)
@@ -148,6 +156,40 @@ namespace LogoSharp
             foreach (var child in tupleNode.ChildNodes)
             {
                 result.Add(Convert.ToSingle(child.Token.Value));
+            }
+        }
+
+        private Evaluation EvaluateArithmeticExpression(ParseTreeNode expression)
+        {
+            switch (expression.Term.Name)
+            {
+                case "BINARY_EXPRESSION":
+                    var leftNode = expression.ChildNodes[0];
+                    var operatorNode = expression.ChildNodes[1];
+                    var rightNode = expression.ChildNodes[2];
+                    var leftEvaluation = EvaluateArithmeticExpression(leftNode);
+                    var rightEvaluation = EvaluateArithmeticExpression(rightNode);
+                    var binaryOperation = BinaryOperation.Add;
+                    switch (operatorNode.Term.Name)
+                    {
+                        case "+":
+                            binaryOperation = BinaryOperation.Add;
+                            break;
+                        case "-":
+                            binaryOperation = BinaryOperation.Sub;
+                            break;
+                        case "*":
+                            binaryOperation = BinaryOperation.Mul;
+                            break;
+                        case "/":
+                            binaryOperation = BinaryOperation.Div;
+                            break;
+                    }
+                    return new BinaryEvaluation(leftEvaluation, rightEvaluation, binaryOperation);
+                case "FUNCTION_CALL":
+                    throw new Exception();
+                default:
+                    return new ConstantEvaluation(Convert.ToSingle(expression.Token.Text));
             }
         }
 

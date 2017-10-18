@@ -1,4 +1,5 @@
-﻿using Irony.Parsing;
+﻿using Irony.Interpreter.Ast;
+using Irony.Parsing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,20 +22,34 @@ namespace LogoSharp
             integer_number.DefaultIntTypes = new[] { TypeCode.Int16, TypeCode.Int32, TypeCode.Int64 };
             decimal_number.DefaultFloatType = TypeCode.Single;
 
+            // identifiers
+            var identifier = new IdentifierTerminal("IDENTIFIER");
+
             // Non terminals
-            // 5. Basic
+            // 10. Expressions
+            var EXPRESSION = new NonTerminal("EXPRESSION");
+            var BINARY_OPERATOR = new NonTerminal("BINARY_OPERATOR");
+            var BINARY_EXPRESSION = new NonTerminal("BINARY_EXPRESSION", typeof(BinaryOperationNode));
+            var PARENTHESIS_EXPRESSION = new NonTerminal("PARENTHESIS_EXPRESSION");
+            var EXPRESSION_FACTOR = new NonTerminal("EXPRESSION_FACTOR");
+
+            // 20. Function calls
+            var FUNCTION_ARGS = new NonTerminal("FUNCTION_ARGS");
+            var FUNCTION_CALL = new NonTerminal("FUNCTION_CALL");
+
+            // 50. Basic
             var LSB = new NonTerminal("LEFT_SQUARE_BRACKET");
             var RSB = new NonTerminal("RIGHT_SQUARE_BRACKET");
 
-            // 10. Program
+            // 100. Program
             var PROGRAM = new NonTerminal("PROGRAM");
 
-            // 20. Tuples
+            // 150. Tuples
             var TUPLE_ELEMENT = new NonTerminal("TUPLE_ELEMENT");
             var TUPLE = new NonTerminal("TUPLE");
             var TUPLEARGS = new NonTerminal("TUPLEARGS");
 
-            // 30. Drawing commands
+            // 200. Drawing commands
             var LT = new NonTerminal("LEFT");
             var RT = new NonTerminal("RIGHT");
             var BK = new NonTerminal("BACKWARD");
@@ -44,7 +59,7 @@ namespace LogoSharp
             var DRAW = new NonTerminal("DRAW");
             var DRAWING_COMMAND = new NonTerminal("DRAWING_COMMAND");
 
-            // 40. Pen commands
+            // 250. Pen commands
             var PC = new NonTerminal("PEN_COLOR");
             var PE = new NonTerminal("PEN_ERASE");
             var PN = new NonTerminal("PEN_NORMAL");
@@ -56,13 +71,13 @@ namespace LogoSharp
 
             var BASIC_COMMAND = new NonTerminal("BASIC_COMMAND");
 
-            // 50. Flow Controls
+            // 300. Flow Controls
             var REPEAT_COMMAND = new NonTerminal("REPEAT_COMMAND");
             var REPEAT_BODY = new NonTerminal("REPEAT_BODY");
 
             var FLOW_CONTROL_COMMAND = new NonTerminal("FLOW_CONTROL_COMMAND");
 
-            // 60. Final command
+            // 350. Final command
             var COMMAND_LINE = new NonTerminal("COMMAND_LINE");
             var COMMAND = new NonTerminal("COMMAND");
 
@@ -74,6 +89,15 @@ namespace LogoSharp
             TUPLE.Rule = MakeStarRule(TUPLE, TUPLE_ELEMENT);
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
+            EXPRESSION.Rule = EXPRESSION_FACTOR | PARENTHESIS_EXPRESSION | BINARY_EXPRESSION | FUNCTION_CALL;
+            EXPRESSION_FACTOR.Rule = integer_number | decimal_number;
+            PARENTHESIS_EXPRESSION.Rule = "(" + EXPRESSION + ")";
+            BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
+            BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
+
+            FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(","), EXPRESSION);
+            FUNCTION_CALL.Rule = identifier + "(" + FUNCTION_ARGS + ")";
+
             LT.Rule = ToTerm("LT") | ToTerm("LEFT");
             RT.Rule = ToTerm("RT") | ToTerm("RIGHT");
             FD.Rule = ToTerm("FD") | ToTerm("FORWARD");
@@ -81,11 +105,11 @@ namespace LogoSharp
             ARC.Rule = ToTerm("ARC") | ToTerm("ARC2");
             DELAY.Rule = ToTerm("DELAY");
             DRAW.Rule = ToTerm("CLS") | ToTerm("DRAW") | ToTerm("CLEARSCR") | ToTerm("CLEARSCREEN");
-            DRAWING_COMMAND.Rule = LT + integer_number | 
-                RT + integer_number | 
-                FD + integer_number | 
-                BK + integer_number |
-                ARC + integer_number |
+            DRAWING_COMMAND.Rule = LT + EXPRESSION | 
+                RT + EXPRESSION | 
+                FD + EXPRESSION | 
+                BK + EXPRESSION |
+                ARC + EXPRESSION |
                 DELAY + integer_number | DRAW;
 
             PC.Rule = ToTerm("SETPENCOLOR") | "SETPC" | "PC";
@@ -99,7 +123,7 @@ namespace LogoSharp
 
             // REPEAT_BODY.Rule = REPEAT_BODY + BASIC_COMMAND | BASIC_COMMAND;
             REPEAT_BODY.Rule = MakeStarRule(REPEAT_BODY, COMMAND_LINE);
-            REPEAT_COMMAND.Rule = ToTerm("REPEAT") + integer_number + LSB + REPEAT_BODY + RSB;
+            REPEAT_COMMAND.Rule = ToTerm("REPEAT") + EXPRESSION + LSB + REPEAT_BODY + RSB;
 
             BASIC_COMMAND.Rule = DRAWING_COMMAND | PEN_COMMAND;
             FLOW_CONTROL_COMMAND.Rule = REPEAT_COMMAND;
@@ -113,9 +137,22 @@ namespace LogoSharp
             RegisterOperators(40, "+", "-");
 
             RegisterBracePair("[", "]");
+            RegisterBracePair("(", ")");
+
+            MarkPunctuation("(", ")");
             MarkPunctuation(LSB, RSB);
 
-            MarkTransient(COMMAND, COMMAND_LINE, BASIC_COMMAND, FLOW_CONTROL_COMMAND, TUPLEARGS, TUPLE_ELEMENT);
+            MarkTransient(COMMAND, 
+                COMMAND_LINE, 
+                BASIC_COMMAND, 
+                FLOW_CONTROL_COMMAND, 
+                TUPLEARGS, 
+                TUPLE_ELEMENT, 
+                EXPRESSION, 
+                EXPRESSION_FACTOR, 
+                BINARY_OPERATOR, 
+                PARENTHESIS_EXPRESSION,
+                FUNCTION_ARGS);
 
             this.Root = PROGRAM;
         }
