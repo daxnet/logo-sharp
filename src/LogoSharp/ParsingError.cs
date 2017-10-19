@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Irony.Parsing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,11 @@ namespace LogoSharp
         public int Line { get; }
 
         public string Message { get; }
+
+        public static ParsingError FromParseTreeNode(ParseTreeNode node, string message)
+        {
+            return new ParsingError(node.Span.Location.Position, node.Span.Location.Column, node.Span.Location.Line, message);
+        }
 
         public override string ToString()
         {

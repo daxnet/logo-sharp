@@ -8,5 +8,13 @@ namespace LogoSharp.Evaluations
 {
     internal abstract class FunctionEvaluation : Evaluation
     {
+        protected readonly IEnumerable<float> parameterValues;
+
+        protected FunctionEvaluation(IEnumerable<float> parameterValues)
+        {
+            this.parameterValues = parameterValues;
+        }
+
+        public abstract bool ValidateParameters();
     }
 }

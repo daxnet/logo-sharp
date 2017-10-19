@@ -13,11 +13,14 @@ namespace LogoSharp.Drawing
 {
     public sealed class Turtle : IDisposable
     {
+        private const int MAX_CANVAS_WIDTH = 3000;
+        private const int MAX_CANVAS_HEIGHT = 3000;
+
         private readonly Panel control;
         private readonly PictureBox turtlePicture = new PictureBox();
         private readonly Image turtleImage;
-        private readonly Image drawingImage;
-        private readonly Graphics drawingGraphics;
+        private Image drawingImage;
+        private Graphics drawingGraphics;
         private float angle = 90F;
         private Color penColor = Color.Black;
         private float penWidth = 1.0F;
@@ -28,14 +31,15 @@ namespace LogoSharp.Drawing
             this.Dispose(false);
         }
 
-        public Turtle(Panel panel)
-            : this(panel, Properties.Resources.tortoise32)
+        public Turtle(Panel panel, int maximumCanvasWidth = MAX_CANVAS_WIDTH, int maximumCanvasHeight = MAX_CANVAS_HEIGHT)
+            : this(panel, Properties.Resources.tortoise32, maximumCanvasWidth, maximumCanvasHeight)
         { }
 
-        public Turtle(Panel control, Image turtleImage)
+        public Turtle(Panel control, Image turtleImage, int maximumCanvasWidth = MAX_CANVAS_WIDTH, int maximumCanvasHeight = MAX_CANVAS_HEIGHT)
         {
             this.control = control;
             this.control.Paint += this.OnControlPaint;
+            this.control.ClientSizeChanged += this.OnClientSizeChanged;
 
             this.turtleImage = turtleImage;
 
@@ -45,8 +49,8 @@ namespace LogoSharp.Drawing
             turtlePicture.Image = turtleImage;
             turtlePicture.BackColor = Color.Transparent;
             this.control.Controls.Add(turtlePicture);
-        
-            this.drawingImage = new Bitmap(this.control.ClientSize.Width, this.control.ClientSize.Height);
+
+            this.drawingImage = new Bitmap(maximumCanvasWidth, maximumCanvasHeight);
             this.drawingGraphics = Graphics.FromImage(this.drawingImage);
             this.drawingGraphics.Clear(Color.White);
             this.drawingGraphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -143,6 +147,21 @@ namespace LogoSharp.Drawing
 
         public void SetDelayMilliseconds(int milliseconds) => this.delayMilliseconds = milliseconds;
 
+        public void Save(string fileName)
+        {
+            using (var bmp = new Bitmap(this.control.ClientSize.Width, this.control.ClientSize.Height))
+            {
+                using (var graphics = Graphics.FromImage(bmp))
+                {
+                    graphics.Clear(Color.White);
+                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                    graphics.DrawImage(this.drawingImage, 0, 0, new RectangleF(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
+                }
+
+                bmp.Save(fileName);
+            }
+        }
+
         public override string ToString()
         {
             return $"Position: {this.Position}, Angle: {this.Angle}, PenStatus: {this.PenStatus}";
@@ -225,14 +244,38 @@ namespace LogoSharp.Drawing
             }
         }
 
+        private void OnClientSizeChanged(object sender, EventArgs e)
+        {
+            if (this.control != null)
+            {
+                Reset();
+
+                //var newWidth = this.control.ClientSize.Width;
+                //var newHeight = this.control.ClientSize.Height;
+
+                //var newImage = new Bitmap(newWidth, newHeight);
+
+                //using (var graphics = Graphics.FromImage(newImage))
+                //{
+                //    graphics.Clear(Color.White);
+                //    graphics.DrawImage(this.drawingImage, 0, 0, this.drawingImage.Width, this.drawingImage.Height);
+                //}
+
+                //this.drawingImage.Dispose();
+                //this.drawingGraphics.Dispose();
+
+                //this.drawingImage = newImage;
+                //this.drawingGraphics = Graphics.FromImage(this.drawingImage);
+                //this.drawingGraphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+                this.control.Invalidate();
+            }
+        }
+
         private static PointF WorldPositionToControl(Control control, PointF original)
         {
             var w = control.ClientSize.Width;
             var h = control.ClientSize.Height;
-
-            //var translatedX = original.X > w ? original.X % w : original.X;
-            //var translatedY = original.Y > h ? original.Y % h : original.Y;
-
             return new PointF(w / 2.0F + original.X, h / 2.0F - original.Y);
         }
 

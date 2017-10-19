@@ -57,6 +57,8 @@
             this.pnlMain = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -272,6 +274,7 @@
             // 
             // tpDrawing
             // 
+            this.tpDrawing.Controls.Add(this.btnSave);
             this.tpDrawing.Controls.Add(this.btnChoose);
             this.tpDrawing.Controls.Add(this.label1);
             this.tpDrawing.Controls.Add(this.lblColor);
@@ -415,14 +418,30 @@
             this.timer1.Interval = 500;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.Location = new System.Drawing.Point(9, 126);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(202, 23);
+            this.btnSave.TabIndex = 10;
+            this.btnSave.Text = "Save Image...";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.DefaultExt = "png";
+            this.saveFileDialog1.Filter = "PNG Files (*.png)|*.png";
+            this.saveFileDialog1.Title = "Save the current drawing";
+            // 
             // FrmTesting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(966, 689);
             this.Controls.Add(this.splitContainer);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
             this.Name = "FrmTesting";
             this.Text = "Testing Form";
             this.splitContainer.Panel1.ResumeLayout(false);
@@ -473,6 +492,8 @@
         private System.Windows.Forms.Button btnExecute;
         private System.Windows.Forms.TextBox txtSourceCode;
         private System.Windows.Forms.TextBox txtError;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 

@@ -15,8 +15,8 @@ namespace LogoSharp
             : base(false)
         {
             // Literals
-            var integer_number = new NumberLiteral("INTEGER", NumberOptions.IntOnly);
-            var decimal_number = new NumberLiteral("DECIMAL");
+            var integer_number = new NumberLiteral("INTEGER", NumberOptions.AllowSign | NumberOptions.IntOnly);
+            var decimal_number = new NumberLiteral("DECIMAL", NumberOptions.AllowSign);
             var string_literal = new StringLiteral("STRING");
 
             integer_number.DefaultIntTypes = new[] { TypeCode.Int16, TypeCode.Int32, TypeCode.Int64 };

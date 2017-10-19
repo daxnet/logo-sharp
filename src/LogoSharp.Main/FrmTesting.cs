@@ -156,5 +156,13 @@ namespace LogoSharp.Main
                 txtError.Text = string.Join(Environment.NewLine, pex.ParsingErrors.Select(x => x.ToString()));
             }
         }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                this.turtle.Save(saveFileDialog1.FileName);
+            }
+        }
     }
 }

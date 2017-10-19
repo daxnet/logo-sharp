@@ -1,6 +1,7 @@
 ﻿using Irony;
 using Irony.Parsing;
 using LogoSharp.Evaluations;
+using LogoSharp.Evaluations.Functions;
 using LogoSharp.EventArguments;
 using System;
 using System.Collections.Generic;
@@ -117,7 +118,7 @@ namespace LogoSharp
                     {
                         throw new ParsingException("Incorrect command invocation.", new[]
                         {
-                            new ParsingError(node.Span.Location.Position, node.Span.Location.Column, node.Span.Location.Line, $"The number of arguments must be 3, instead of {rgb.Count}.")
+                            ParsingError.FromParseTreeNode(node, $"The number of arguments must be 3, instead of {rgb.Count}.")
                         });
                     }
 
@@ -125,7 +126,7 @@ namespace LogoSharp
                     {
                         throw new ParsingException("Command parameters are out of range.", new[]
                         {
-                            new ParsingError(node.Span.Location.Position, node.Span.Location.Column, node.Span.Location.Line, "The parameter value should be greater than or equal to 0 and less than or equal to 255.")
+                            ParsingError.FromParseTreeNode(node, "The parameter value should be greater than or equal to 0 and less than or equal to 255.")
                         });
                     }
 
@@ -187,7 +188,17 @@ namespace LogoSharp
                     }
                     return new BinaryEvaluation(leftEvaluation, rightEvaluation, binaryOperation);
                 case "FUNCTION_CALL":
-                    throw new Exception();
+                    var funcName = expression.ChildNodes[0].Token.Text;
+                    var funcParameters = new List<float>();
+                    if (expression.ChildNodes.Count > 1)
+                    {
+                        var functionArgsNode = expression.ChildNodes[1];
+                        for (var idx = 0; idx < functionArgsNode.ChildNodes.Count; idx++)
+                        {
+                            funcParameters.Add(EvaluateArithmeticExpression(functionArgsNode.ChildNodes[idx]).Value);
+                        }
+                    }
+                    return FunctionRegistry.Call(expression, funcName, funcParameters);
                 default:
                     return new ConstantEvaluation(Convert.ToSingle(expression.Token.Text));
             }
