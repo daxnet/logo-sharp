@@ -63,6 +63,9 @@ namespace LogoSharp
                 case "REPEAT_COMMAND":
                     this.ParseRepeatCommand(node);
                     break;
+                case "ASSIGNMENT":
+                    this.ParseAssignment(node);
+                    break;
             }
         }
 
@@ -152,6 +155,21 @@ namespace LogoSharp
             }
         }
 
+        private void ParseAssignment(ParseTreeNode assignmentNode)
+        {
+            var variable = assignmentNode.ChildNodes[0].Token.Text;
+            var expressionNode = assignmentNode.ChildNodes[2];
+            var expression = EvaluateArithmeticExpression(expressionNode);
+            if (variables.Any(kvp => kvp.Key.Equals(variable, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                variables[variable] = expression.Value;
+            }
+            else
+            {
+                variables.Add(variable, expression.Value);
+            }
+        }
+
         private void ParseTupleValues(ParseTreeNode tupleNode, List<float> result)
         {
             foreach (var child in tupleNode.ChildNodes)
@@ -164,6 +182,14 @@ namespace LogoSharp
         {
             switch (expression.Term.Name)
             {
+                case "IDENTIFIER":
+                    var variableName = expression.Token.Text;
+                    if (!variables.Any(kvp => kvp.Key.Equals(variableName, StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        throw new ParsingException("Variable has not been defined.", new[] { ParsingError.FromParseTreeNode(expression, $"The requested parameter '{variableName}' is not defined.") });
+                    }
+
+                    return new ConstantEvaluation(Convert.ToSingle(variables.First(kvp => kvp.Key.Equals(variableName)).Value));
                 case "BINARY_EXPRESSION":
                     var leftNode = expression.ChildNodes[0];
                     var operatorNode = expression.ChildNodes[1];

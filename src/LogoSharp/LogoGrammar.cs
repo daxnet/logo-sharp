@@ -33,6 +33,9 @@ namespace LogoSharp
             var PARENTHESIS_EXPRESSION = new NonTerminal("PARENTHESIS_EXPRESSION");
             var EXPRESSION_FACTOR = new NonTerminal("EXPRESSION_FACTOR");
 
+            // 15. Assignments
+            var ASSIGNMENT = new NonTerminal("ASSIGNMENT");
+
             // 20. Function calls
             var FUNCTION_ARGS = new NonTerminal("FUNCTION_ARGS");
             var FUNCTION_CALL = new NonTerminal("FUNCTION_CALL");
@@ -90,13 +93,15 @@ namespace LogoSharp
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
             EXPRESSION.Rule = EXPRESSION_FACTOR | PARENTHESIS_EXPRESSION | BINARY_EXPRESSION | FUNCTION_CALL;
-            EXPRESSION_FACTOR.Rule = integer_number | decimal_number;
+            EXPRESSION_FACTOR.Rule = integer_number | decimal_number | identifier;
             PARENTHESIS_EXPRESSION.Rule = "(" + EXPRESSION + ")";
             BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
             BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
 
             FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(","), EXPRESSION);
             FUNCTION_CALL.Rule = identifier + "(" + FUNCTION_ARGS + ")";
+
+            ASSIGNMENT.Rule = identifier + "=" + EXPRESSION;
 
             LT.Rule = ToTerm("LT") | ToTerm("LEFT");
             RT.Rule = ToTerm("RT") | ToTerm("RIGHT");
@@ -128,7 +133,7 @@ namespace LogoSharp
             BASIC_COMMAND.Rule = DRAWING_COMMAND | PEN_COMMAND;
             FLOW_CONTROL_COMMAND.Rule = REPEAT_COMMAND;
 
-            COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND;
+            COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND | ASSIGNMENT;
             COMMAND.Rule = COMMAND_LINE | Empty + NewLine;
             PROGRAM.Rule = MakePlusRule(PROGRAM, COMMAND); 
 
