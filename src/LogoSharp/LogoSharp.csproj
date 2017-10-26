@@ -57,6 +57,7 @@
     <Compile Include="Evaluations\Functions\MathCosFunction.cs" />
     <Compile Include="Evaluations\Functions\MathPiFunction.cs" />
     <Compile Include="Evaluations\Functions\MathSinFunction.cs" />
+    <Compile Include="Evaluations\Functions\RandomFunction.cs" />
     <Compile Include="EventArguments\BackwardEventArgs.cs" />
     <Compile Include="EventArguments\DelayEventArgs.cs" />
     <Compile Include="EventArguments\ForwardEventArgs.cs" />

@@ -174,7 +174,8 @@ namespace LogoSharp
         {
             foreach (var child in tupleNode.ChildNodes)
             {
-                result.Add(Convert.ToSingle(child.Token.Value));
+                // result.Add(Convert.ToSingle(child.Token.Value));
+                result.Add(EvaluateArithmeticExpression(child).Value);
             }
         }
 

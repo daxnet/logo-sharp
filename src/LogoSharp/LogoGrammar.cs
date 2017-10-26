@@ -1,10 +1,6 @@
 ﻿using Irony.Interpreter.Ast;
 using Irony.Parsing;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LogoSharp
 {
@@ -43,6 +39,8 @@ namespace LogoSharp
             // 50. Basic
             var LSB = new NonTerminal("LEFT_SQUARE_BRACKET");
             var RSB = new NonTerminal("RIGHT_SQUARE_BRACKET");
+            var LPS = new NonTerminal("LEFT_PARENTHESIS");
+            var RPS = new NonTerminal("RIGHT_PARENTHESIS");
 
             // 100. Program
             var PROGRAM = new NonTerminal("PROGRAM");
@@ -86,20 +84,23 @@ namespace LogoSharp
 
             LSB.Rule = ToTerm("[");
             RSB.Rule = ToTerm("]");
+            LPS.Rule = ToTerm("(");
+            RPS.Rule = ToTerm(")");
 
-            TUPLE_ELEMENT.Rule = integer_number | decimal_number;
+            // TUPLE_ELEMENT.Rule = integer_number | decimal_number;
+            // TUPLE_ELEMENT.Rule = EXPRESSION;
             // TUPLE.Rule = TUPLE + TUPLE_ELEMENT | TUPLE_ELEMENT; // Simply using TUPLE | TUPLE_ELEMENT will result in conflicts.
-            TUPLE.Rule = MakeStarRule(TUPLE, TUPLE_ELEMENT);
+            TUPLE.Rule = MakeStarRule(TUPLE, EXPRESSION);
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
             EXPRESSION.Rule = EXPRESSION_FACTOR | PARENTHESIS_EXPRESSION | BINARY_EXPRESSION | FUNCTION_CALL;
             EXPRESSION_FACTOR.Rule = integer_number | decimal_number | identifier;
-            PARENTHESIS_EXPRESSION.Rule = "(" + EXPRESSION + ")";
+            PARENTHESIS_EXPRESSION.Rule = LPS + EXPRESSION + RPS;
             BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
             BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
 
             FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(","), EXPRESSION);
-            FUNCTION_CALL.Rule = identifier + "(" + FUNCTION_ARGS + ")";
+            FUNCTION_CALL.Rule = identifier + LPS + FUNCTION_ARGS + RPS;
 
             ASSIGNMENT.Rule = identifier + "=" + EXPRESSION;
 
@@ -144,7 +145,7 @@ namespace LogoSharp
             RegisterBracePair("[", "]");
             RegisterBracePair("(", ")");
 
-            MarkPunctuation("(", ")");
+            MarkPunctuation(LPS, RPS);
             MarkPunctuation(LSB, RSB);
 
             MarkTransient(COMMAND, 
@@ -152,7 +153,7 @@ namespace LogoSharp
                 BASIC_COMMAND, 
                 FLOW_CONTROL_COMMAND, 
                 TUPLEARGS, 
-                TUPLE_ELEMENT, 
+                // TUPLE_ELEMENT, 
                 EXPRESSION, 
                 EXPRESSION_FACTOR, 
                 BINARY_OPERATOR, 
