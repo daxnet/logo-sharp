@@ -11,11 +11,12 @@ namespace LogoSharp
             : base(false)
         {
             // Literals
-            var integer_number = new NumberLiteral("INTEGER", NumberOptions.AllowSign | NumberOptions.IntOnly);
-            var decimal_number = new NumberLiteral("DECIMAL", NumberOptions.AllowSign);
+            // var integer_number = new NumberLiteral("INTEGER", NumberOptions.AllowSign | NumberOptions.IntOnly);
+            var decimal_number = new NumberLiteral("DECIMAL");
+
             var string_literal = new StringLiteral("STRING");
 
-            integer_number.DefaultIntTypes = new[] { TypeCode.Int16, TypeCode.Int32, TypeCode.Int64 };
+            // integer_number.DefaultIntTypes = new[] { TypeCode.Int16, TypeCode.Int32, TypeCode.Int64 };
             decimal_number.DefaultFloatType = TypeCode.Single;
 
             // identifiers
@@ -24,10 +25,13 @@ namespace LogoSharp
             // Non terminals
             // 10. Expressions
             var EXPRESSION = new NonTerminal("EXPRESSION");
+            var PRIMARY_EXPRESSION = new NonTerminal("PRIMARY_EXPRESSION");
             var BINARY_OPERATOR = new NonTerminal("BINARY_OPERATOR");
             var BINARY_EXPRESSION = new NonTerminal("BINARY_EXPRESSION", typeof(BinaryOperationNode));
             var PARENTHESIS_EXPRESSION = new NonTerminal("PARENTHESIS_EXPRESSION");
             var EXPRESSION_FACTOR = new NonTerminal("EXPRESSION_FACTOR");
+            var UNARY_OPERATOR = new NonTerminal("UNARY_OPERATOR");
+            var UNARY_EXPRESSION = new NonTerminal("UNARY_EXPRESSION");
 
             // 15. Assignments
             var ASSIGNMENT = new NonTerminal("ASSIGNMENT");
@@ -93,14 +97,22 @@ namespace LogoSharp
             TUPLE.Rule = MakeStarRule(TUPLE, EXPRESSION);
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
-            EXPRESSION.Rule = EXPRESSION_FACTOR | PARENTHESIS_EXPRESSION | BINARY_EXPRESSION | FUNCTION_CALL;
-            EXPRESSION_FACTOR.Rule = integer_number | decimal_number | identifier;
+            EXPRESSION.Rule = BINARY_EXPRESSION | PRIMARY_EXPRESSION;
+            EXPRESSION_FACTOR.Rule = /*integer_number |*/ decimal_number | identifier;
+
+            PRIMARY_EXPRESSION.Rule = EXPRESSION_FACTOR | UNARY_EXPRESSION | PARENTHESIS_EXPRESSION | FUNCTION_CALL;
+
             PARENTHESIS_EXPRESSION.Rule = LPS + EXPRESSION + RPS;
+
+            UNARY_OPERATOR.Rule = ToTerm("-");
+            UNARY_EXPRESSION.Rule = UNARY_OPERATOR + PRIMARY_EXPRESSION;
+
             BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
             BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
+            
 
             FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(","), EXPRESSION);
-            FUNCTION_CALL.Rule = identifier + LPS + FUNCTION_ARGS + RPS;
+            FUNCTION_CALL.Rule = identifier + PreferShiftHere() + LPS + FUNCTION_ARGS + RPS;
 
             ASSIGNMENT.Rule = identifier + "=" + EXPRESSION;
 
@@ -116,7 +128,7 @@ namespace LogoSharp
                 FD + EXPRESSION | 
                 BK + EXPRESSION |
                 ARC + EXPRESSION |
-                DELAY + integer_number | DRAW;
+                DELAY + decimal_number | DRAW;
 
             PC.Rule = ToTerm("SETPENCOLOR") | "SETPC" | "PC";
             PE.Rule = ToTerm("PENERASE") | "PE";
@@ -156,7 +168,9 @@ namespace LogoSharp
                 // TUPLE_ELEMENT, 
                 EXPRESSION, 
                 EXPRESSION_FACTOR, 
+                PRIMARY_EXPRESSION,
                 BINARY_OPERATOR, 
+                UNARY_OPERATOR,
                 PARENTHESIS_EXPRESSION,
                 FUNCTION_ARGS);
 
