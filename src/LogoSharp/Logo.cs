@@ -26,6 +26,9 @@ namespace LogoSharp
         public event EventHandler PenUp;
         public event EventHandler PenDown;
         public event EventHandler ClearScreen;
+        public event EventHandler GoHome;
+        public event EventHandler ShowTurtle;
+        public event EventHandler HideTurtle;
 
         public void Execute(string source)
         {
@@ -99,6 +102,15 @@ namespace LogoSharp
                     break;
                 case "DRAW":
                     this.OnClearScreen(EventArgs.Empty);
+                    break;
+                case "HOME":
+                    this.OnGoHome(EventArgs.Empty);
+                    break;
+                case "SHOWTURTLE":
+                    this.OnShowTurtle(EventArgs.Empty);
+                    break;
+                case "HIDETURTLE":
+                    this.OnHideTurtle(EventArgs.Empty);
                     break;
             }
         }
@@ -275,5 +287,14 @@ namespace LogoSharp
         {
             this.ClearScreen?.Invoke(this, e);
         }
+
+        private void OnGoHome(EventArgs e)
+        {
+            this.GoHome?.Invoke(this, e);
+        }
+
+        public void OnShowTurtle(EventArgs e) => this.ShowTurtle?.Invoke(this, e);
+
+        public void OnHideTurtle(EventArgs e) => this.HideTurtle?.Invoke(this, e);
     }
 }

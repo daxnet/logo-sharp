@@ -69,6 +69,21 @@ namespace LogoSharp.Main
               {
                   this.turtle.Clear();
               };
+
+            logo.GoHome += (s, e) =>
+              {
+                  this.turtle.Reset();
+              };
+
+            logo.ShowTurtle += (s, e) =>
+              {
+                  this.turtle.ShowTurtle();
+              };
+
+            logo.HideTurtle += (s, e) =>
+              {
+                  this.turtle.HideTurtle();
+              };
         }
 
         private void timer1_Tick(object sender, EventArgs e)

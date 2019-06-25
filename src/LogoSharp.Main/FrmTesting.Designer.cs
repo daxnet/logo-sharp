@@ -44,6 +44,7 @@
             this.btnTurnLeft = new System.Windows.Forms.Button();
             this.numAngle = new System.Windows.Forms.NumericUpDown();
             this.tpDrawing = new System.Windows.Forms.TabPage();
+            this.btnSave = new System.Windows.Forms.Button();
             this.btnChoose = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.lblColor = new System.Windows.Forms.Label();
@@ -57,7 +58,6 @@
             this.pnlMain = new System.Windows.Forms.Panel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.btnSave = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -87,8 +87,8 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.pnlMain);
-            this.splitContainer.Size = new System.Drawing.Size(966, 689);
-            this.splitContainer.SplitterDistance = 244;
+            this.splitContainer.Size = new System.Drawing.Size(1116, 689);
+            this.splitContainer.SplitterDistance = 434;
             this.splitContainer.TabIndex = 0;
             // 
             // tabControl
@@ -102,7 +102,7 @@
             this.tabControl.Multiline = true;
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(244, 689);
+            this.tabControl.Size = new System.Drawing.Size(434, 689);
             this.tabControl.TabIndex = 0;
             // 
             // tabPage2
@@ -115,7 +115,7 @@
             this.tabPage2.Location = new System.Drawing.Point(23, 4);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(217, 681);
+            this.tabPage2.Size = new System.Drawing.Size(407, 681);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Turtle";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -123,7 +123,7 @@
             // btnHide
             // 
             this.btnHide.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHide.Location = new System.Drawing.Point(136, 37);
+            this.btnHide.Location = new System.Drawing.Point(326, 37);
             this.btnHide.Name = "btnHide";
             this.btnHide.Size = new System.Drawing.Size(75, 23);
             this.btnHide.TabIndex = 8;
@@ -151,7 +151,7 @@
             this.grpMoving.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.grpMoving.Location = new System.Drawing.Point(6, 152);
             this.grpMoving.Name = "grpMoving";
-            this.grpMoving.Size = new System.Drawing.Size(205, 100);
+            this.grpMoving.Size = new System.Drawing.Size(395, 100);
             this.grpMoving.TabIndex = 6;
             this.grpMoving.TabStop = false;
             this.grpMoving.Text = "Moving";
@@ -159,7 +159,7 @@
             // btnBackward
             // 
             this.btnBackward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBackward.Location = new System.Drawing.Point(124, 45);
+            this.btnBackward.Location = new System.Drawing.Point(314, 45);
             this.btnBackward.Name = "btnBackward";
             this.btnBackward.Size = new System.Drawing.Size(75, 23);
             this.btnBackward.TabIndex = 2;
@@ -193,7 +193,7 @@
             0,
             0});
             this.numSteps.Name = "numSteps";
-            this.numSteps.Size = new System.Drawing.Size(193, 20);
+            this.numSteps.Size = new System.Drawing.Size(383, 20);
             this.numSteps.TabIndex = 0;
             this.numSteps.Value = new decimal(new int[] {
             100,
@@ -207,7 +207,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnReset.Location = new System.Drawing.Point(6, 8);
             this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(205, 23);
+            this.btnReset.Size = new System.Drawing.Size(395, 23);
             this.btnReset.TabIndex = 5;
             this.btnReset.Text = "Reset";
             this.btnReset.UseVisualStyleBackColor = true;
@@ -222,7 +222,7 @@
             this.grpDirection.Controls.Add(this.numAngle);
             this.grpDirection.Location = new System.Drawing.Point(6, 66);
             this.grpDirection.Name = "grpDirection";
-            this.grpDirection.Size = new System.Drawing.Size(205, 80);
+            this.grpDirection.Size = new System.Drawing.Size(395, 80);
             this.grpDirection.TabIndex = 4;
             this.grpDirection.TabStop = false;
             this.grpDirection.Text = "Direction";
@@ -230,7 +230,7 @@
             // btnTurnRight
             // 
             this.btnTurnRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTurnRight.Location = new System.Drawing.Point(124, 45);
+            this.btnTurnRight.Location = new System.Drawing.Point(314, 45);
             this.btnTurnRight.Name = "btnTurnRight";
             this.btnTurnRight.Size = new System.Drawing.Size(75, 23);
             this.btnTurnRight.TabIndex = 2;
@@ -264,7 +264,7 @@
             0,
             0});
             this.numAngle.Name = "numAngle";
-            this.numAngle.Size = new System.Drawing.Size(193, 20);
+            this.numAngle.Size = new System.Drawing.Size(383, 20);
             this.numAngle.TabIndex = 0;
             this.numAngle.Value = new decimal(new int[] {
             30,
@@ -288,6 +288,18 @@
             this.tpDrawing.TabIndex = 2;
             this.tpDrawing.Text = "Drawing";
             this.tpDrawing.UseVisualStyleBackColor = true;
+            // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.Location = new System.Drawing.Point(9, 126);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(202, 23);
+            this.btnSave.TabIndex = 10;
+            this.btnSave.Text = "Save Image...";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnChoose
             // 
@@ -409,7 +421,7 @@
             this.pnlMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlMain.Location = new System.Drawing.Point(13, 12);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(693, 665);
+            this.pnlMain.Size = new System.Drawing.Size(653, 665);
             this.pnlMain.TabIndex = 1;
             // 
             // timer1
@@ -417,18 +429,6 @@
             this.timer1.Enabled = true;
             this.timer1.Interval = 500;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // btnSave
-            // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(9, 126);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(202, 23);
-            this.btnSave.TabIndex = 10;
-            this.btnSave.Text = "Save Image...";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // saveFileDialog1
             // 
@@ -440,7 +440,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(966, 689);
+            this.ClientSize = new System.Drawing.Size(1116, 689);
             this.Controls.Add(this.splitContainer);
             this.Name = "FrmTesting";
             this.Text = "Testing Form";

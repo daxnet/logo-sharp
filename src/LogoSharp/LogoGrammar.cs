@@ -58,6 +58,9 @@ namespace LogoSharp
             var ARC = new NonTerminal("ARC");
             var DELAY = new NonTerminal("DELAY");
             var DRAW = new NonTerminal("DRAW");
+            var HOME = new NonTerminal("HOME");
+            var SHOW_TURTLE = new NonTerminal("SHOWTURTLE");
+            var HIDE_TURTLE = new NonTerminal("HIDETURTLE");
             var DRAWING_COMMAND = new NonTerminal("DRAWING_COMMAND");
 
             // 250. Pen commands
@@ -87,36 +90,37 @@ namespace LogoSharp
             LPS.Rule = ToTerm("(");
             RPS.Rule = ToTerm(")");
 
-            // TUPLE_ELEMENT.Rule = integer_number | decimal_number;
-            // TUPLE_ELEMENT.Rule = EXPRESSION;
-            // TUPLE.Rule = TUPLE + TUPLE_ELEMENT | TUPLE_ELEMENT; // Simply using TUPLE | TUPLE_ELEMENT will result in conflicts.
             TUPLE.Rule = MakeStarRule(TUPLE, EXPRESSION);
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
-            EXPRESSION.Rule = EXPRESSION_FACTOR | PARENTHESIS_EXPRESSION | BINARY_EXPRESSION | FUNCTION_CALL;
+            EXPRESSION.Rule = EXPRESSION_FACTOR | PARENTHESIS_EXPRESSION | BINARY_EXPRESSION| FUNCTION_CALL;
             EXPRESSION_FACTOR.Rule = integer_number | decimal_number | identifier;
             PARENTHESIS_EXPRESSION.Rule = LPS + EXPRESSION + RPS;
             BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
             BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
 
+            // PC [A (255+3) B]
             FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(","), EXPRESSION);
-            FUNCTION_CALL.Rule = identifier + LPS + FUNCTION_ARGS + RPS;
+            FUNCTION_CALL.Rule = identifier + PreferShiftHere() + LPS + PreferShiftHere() + FUNCTION_ARGS + PreferShiftHere() + RPS;
 
             ASSIGNMENT.Rule = identifier + "=" + EXPRESSION;
 
             LT.Rule = ToTerm("LT") | ToTerm("LEFT");
             RT.Rule = ToTerm("RT") | ToTerm("RIGHT");
             FD.Rule = ToTerm("FD") | ToTerm("FORWARD");
-            BK.Rule = ToTerm("BK") | ToTerm("BACKWARD");
+            BK.Rule = ToTerm("BK") | ToTerm("BACKWARD") | ToTerm("BACK");
             ARC.Rule = ToTerm("ARC") | ToTerm("ARC2");
             DELAY.Rule = ToTerm("DELAY");
-            DRAW.Rule = ToTerm("CLS") | ToTerm("DRAW") | ToTerm("CLEARSCR") | ToTerm("CLEARSCREEN");
+            DRAW.Rule = ToTerm("CLS") | ToTerm("DRAW") | ToTerm("CLEARSCR") | ToTerm("CLEARSCREEN") | ToTerm("CS");
+            HOME.Rule = ToTerm("HOME");
+            SHOW_TURTLE.Rule = ToTerm("SHOWTURTLE") | ToTerm("ST");
+            HIDE_TURTLE.Rule = ToTerm("HIDETURTLE") | ToTerm("HT");
             DRAWING_COMMAND.Rule = LT + EXPRESSION | 
                 RT + EXPRESSION | 
                 FD + EXPRESSION | 
                 BK + EXPRESSION |
                 ARC + EXPRESSION |
-                DELAY + integer_number | DRAW;
+                DELAY + integer_number | DRAW | HOME | SHOW_TURTLE | HIDE_TURTLE;
 
             PC.Rule = ToTerm("SETPENCOLOR") | "SETPC" | "PC";
             PE.Rule = ToTerm("PENERASE") | "PE";
