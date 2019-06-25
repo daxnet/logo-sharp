@@ -15,7 +15,7 @@ namespace LogoSharp
     {
         private static readonly LanguageData language = new LanguageData(new LogoGrammar());
         private static readonly Parser parser = new Parser(language);
-        private static readonly Dictionary<string, object> variables = new Dictionary<string, object>();
+        private static readonly Dictionary<string, object> globalVariables = new Dictionary<string, object>();
 
         public event EventHandler<TurnLeftEventArgs> TurnLeft;
         public event EventHandler<TurnRightEventArgs> TurnRight;
@@ -60,6 +60,9 @@ namespace LogoSharp
                 case "DRAWING_COMMAND":
                     this.ParseDrawingCommand(node);
                     break;
+                case "BASIC_CONTROL_COMMAND":
+                    this.ParseBasicControlCommand(node);
+                    break;
                 case "PEN_COMMAND":
                     this.ParsePenCommand(node);
                     break;
@@ -103,6 +106,15 @@ namespace LogoSharp
                 case "DRAW":
                     this.OnClearScreen(EventArgs.Empty);
                     break;
+                
+            }
+        }
+
+        public void ParseBasicControlCommand(ParseTreeNode node)
+        {
+            var commandNode = node.ChildNodes[0];
+            switch(commandNode.Term.Name)
+            {
                 case "HOME":
                     this.OnGoHome(EventArgs.Empty);
                     break;
@@ -172,13 +184,13 @@ namespace LogoSharp
             var variable = assignmentNode.ChildNodes[0].Token.Text;
             var expressionNode = assignmentNode.ChildNodes[2];
             var expression = EvaluateArithmeticExpression(expressionNode);
-            if (variables.Any(kvp => kvp.Key.Equals(variable, StringComparison.InvariantCultureIgnoreCase)))
+            if (globalVariables.Any(kvp => kvp.Key.Equals(variable, StringComparison.InvariantCultureIgnoreCase)))
             {
-                variables[variable] = expression.Value;
+                globalVariables[variable] = expression.Value;
             }
             else
             {
-                variables.Add(variable, expression.Value);
+                globalVariables.Add(variable, expression.Value);
             }
         }
 
@@ -195,14 +207,17 @@ namespace LogoSharp
         {
             switch (expression.Term.Name)
             {
+                case "EXPRESSION":
+                    return EvaluateArithmeticExpression(expression.ChildNodes[0]);
+
                 case "IDENTIFIER":
                     var variableName = expression.Token.Text;
-                    if (!variables.Any(kvp => kvp.Key.Equals(variableName, StringComparison.InvariantCultureIgnoreCase)))
+                    if (!globalVariables.Any(kvp => kvp.Key.Equals(variableName, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         throw new ParsingException("Variable has not been defined.", new[] { ParsingError.FromParseTreeNode(expression, $"The requested parameter '{variableName}' is not defined.") });
                     }
 
-                    return new ConstantEvaluation(Convert.ToSingle(variables.First(kvp => kvp.Key.Equals(variableName)).Value));
+                    return new ConstantEvaluation(Convert.ToSingle(globalVariables.First(kvp => kvp.Key.Equals(variableName)).Value));
                 case "BINARY_EXPRESSION":
                     var leftNode = expression.ChildNodes[0];
                     var operatorNode = expression.ChildNodes[1];

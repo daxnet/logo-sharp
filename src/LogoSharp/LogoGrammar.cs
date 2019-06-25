@@ -25,11 +25,8 @@ namespace LogoSharp
             // Non terminals
             // 10. Expressions
             var EXPRESSION = new NonTerminal("EXPRESSION");
-            var PRIMARY_EXPRESSION = new NonTerminal("PRIMARY_EXPRESSION");
             var BINARY_OPERATOR = new NonTerminal("BINARY_OPERATOR");
             var BINARY_EXPRESSION = new NonTerminal("BINARY_EXPRESSION", typeof(BinaryOperationNode));
-            var PARENTHESIS_EXPRESSION = new NonTerminal("PARENTHESIS_EXPRESSION");
-            var EXPRESSION_FACTOR = new NonTerminal("EXPRESSION_FACTOR");
             var UNARY_OPERATOR = new NonTerminal("UNARY_OPERATOR");
             var UNARY_EXPRESSION = new NonTerminal("UNARY_EXPRESSION");
 
@@ -66,6 +63,7 @@ namespace LogoSharp
             var SHOW_TURTLE = new NonTerminal("SHOWTURTLE");
             var HIDE_TURTLE = new NonTerminal("HIDETURTLE");
             var DRAWING_COMMAND = new NonTerminal("DRAWING_COMMAND");
+            var BASIC_CONTROL_COMMAND = new NonTerminal("BASIC_CONTROL_COMMAND");
 
             // 250. Pen commands
             var PC = new NonTerminal("PEN_COLOR");
@@ -89,6 +87,12 @@ namespace LogoSharp
             var COMMAND_LINE = new NonTerminal("COMMAND_LINE");
             var COMMAND = new NonTerminal("COMMAND");
 
+            // 400. Procedures
+            var PROCEDURE_DECLARE = new NonTerminal("PROCEDURE_DECLARE");
+            var PROCEDURE_BODY = new NonTerminal("PROCEDURE_BODY");
+            var PROCEDURE_END = new NonTerminal("PROCEDURE_END");
+            var PROCEDURE = new NonTerminal("PROCEDURE");
+
             LSB.Rule = ToTerm("[");
             RSB.Rule = ToTerm("]");
             LPS.Rule = ToTerm("(");
@@ -97,22 +101,17 @@ namespace LogoSharp
             TUPLE.Rule = MakeStarRule(TUPLE, EXPRESSION);
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
-            EXPRESSION.Rule = BINARY_EXPRESSION | PRIMARY_EXPRESSION;
-            EXPRESSION_FACTOR.Rule = decimal_number | identifier;
+            EXPRESSION.Rule = decimal_number | identifier | FUNCTION_CALL | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
 
-            PRIMARY_EXPRESSION.Rule = EXPRESSION_FACTOR | UNARY_EXPRESSION | PARENTHESIS_EXPRESSION | FUNCTION_CALL;
-
-            PARENTHESIS_EXPRESSION.Rule = LPS + EXPRESSION + RPS;
-
-            UNARY_OPERATOR.Rule = ToTerm("-");
-            UNARY_EXPRESSION.Rule = UNARY_OPERATOR + PRIMARY_EXPRESSION;
+            UNARY_OPERATOR.Rule = ToTerm("-") | "+";
+            UNARY_EXPRESSION.Rule = UNARY_OPERATOR + EXPRESSION;
 
             BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
             BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
 
             // PC [A (255+3) B]
-            FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(","), EXPRESSION);
-            FUNCTION_CALL.Rule = identifier + PreferShiftHere() + LPS + PreferShiftHere() + FUNCTION_ARGS + PreferShiftHere() + RPS;
+            FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(",", "comma"), EXPRESSION);
+            FUNCTION_CALL.Rule = identifier + PreferShiftHere() + "(" + FUNCTION_ARGS + ")";
 
             ASSIGNMENT.Rule = identifier + "=" + EXPRESSION;
 
@@ -126,12 +125,13 @@ namespace LogoSharp
             HOME.Rule = ToTerm("HOME");
             SHOW_TURTLE.Rule = ToTerm("SHOWTURTLE") | ToTerm("ST");
             HIDE_TURTLE.Rule = ToTerm("HIDETURTLE") | ToTerm("HT");
-            DRAWING_COMMAND.Rule = LT + EXPRESSION | 
-                RT + EXPRESSION | 
-                FD + EXPRESSION | 
+            DRAWING_COMMAND.Rule = LT + EXPRESSION |
+                RT + EXPRESSION |
+                FD + EXPRESSION |
                 BK + EXPRESSION |
                 ARC + EXPRESSION |
-                DELAY + decimal_number | DRAW | HOME | SHOW_TURTLE | HIDE_TURTLE;
+                DELAY + decimal_number | DRAW;
+            BASIC_CONTROL_COMMAND.Rule = HOME | SHOW_TURTLE | HIDE_TURTLE;
 
             PC.Rule = ToTerm("SETPENCOLOR") | "SETPC" | "PC";
             PE.Rule = ToTerm("PENERASE") | "PE";
@@ -146,12 +146,29 @@ namespace LogoSharp
             REPEAT_BODY.Rule = MakeStarRule(REPEAT_BODY, COMMAND_LINE);
             REPEAT_COMMAND.Rule = ToTerm("REPEAT") + EXPRESSION + LSB + REPEAT_BODY + RSB;
 
-            BASIC_COMMAND.Rule = DRAWING_COMMAND | PEN_COMMAND;
+            BASIC_COMMAND.Rule = DRAWING_COMMAND | PEN_COMMAND | BASIC_CONTROL_COMMAND;
             FLOW_CONTROL_COMMAND.Rule = REPEAT_COMMAND;
 
             COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND | ASSIGNMENT;
             COMMAND.Rule = COMMAND_LINE | Empty + NewLine;
-            PROGRAM.Rule = MakePlusRule(PROGRAM, COMMAND); 
+
+            PROCEDURE_DECLARE.Rule = ToTerm("TO") + identifier + NewLine;
+            PROCEDURE_BODY.Rule = MakeStarRule(PROCEDURE_BODY, COMMAND);
+            PROCEDURE_END.Rule = ToTerm("END") + NewLine;
+            PROCEDURE.Rule = PROCEDURE_DECLARE + PROCEDURE_BODY + PROCEDURE_END;
+
+
+            var COMMANDS = new NonTerminal("COMMANDS");
+            COMMANDS.Rule = MakePlusRule(COMMANDS, COMMAND);
+
+            var PROCEDURES = new NonTerminal("PROCEDURES");
+            PROCEDURES.Rule = MakeStarRule(PROCEDURES, PROCEDURE);
+
+
+            var PROGRAM_BODY = new NonTerminal("PROGRAM_BODY");
+            PROGRAM_BODY.Rule = PROCEDURE | COMMAND;
+
+            PROGRAM.Rule = MakePlusRule(PROGRAM, PROGRAM_BODY);
 
             RegisterOperators(60, "^");
             RegisterOperators(50, "*", "/");
@@ -163,18 +180,14 @@ namespace LogoSharp
             MarkPunctuation(LPS, RPS);
             MarkPunctuation(LSB, RSB);
 
-            MarkTransient(COMMAND, 
-                COMMAND_LINE, 
-                BASIC_COMMAND, 
-                FLOW_CONTROL_COMMAND, 
-                TUPLEARGS, 
-                // TUPLE_ELEMENT, 
-                EXPRESSION, 
-                EXPRESSION_FACTOR, 
-                PRIMARY_EXPRESSION,
+            MarkTransient(COMMAND,
+                COMMAND_LINE,
+                BASIC_COMMAND,
+                FLOW_CONTROL_COMMAND,
+                TUPLEARGS,
+                PROGRAM_BODY,
                 BINARY_OPERATOR, 
                 UNARY_OPERATOR,
-                PARENTHESIS_EXPRESSION,
                 FUNCTION_ARGS);
 
             this.Root = PROGRAM;

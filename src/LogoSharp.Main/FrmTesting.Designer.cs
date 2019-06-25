@@ -284,7 +284,7 @@
             this.tpDrawing.Location = new System.Drawing.Point(23, 4);
             this.tpDrawing.Name = "tpDrawing";
             this.tpDrawing.Padding = new System.Windows.Forms.Padding(3);
-            this.tpDrawing.Size = new System.Drawing.Size(217, 681);
+            this.tpDrawing.Size = new System.Drawing.Size(407, 681);
             this.tpDrawing.TabIndex = 2;
             this.tpDrawing.Text = "Drawing";
             this.tpDrawing.UseVisualStyleBackColor = true;
@@ -295,7 +295,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSave.Location = new System.Drawing.Point(9, 126);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(202, 23);
+            this.btnSave.Size = new System.Drawing.Size(392, 23);
             this.btnSave.TabIndex = 10;
             this.btnSave.Text = "Save Image...";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -331,7 +331,7 @@
             // btnPenDown
             // 
             this.btnPenDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnPenDown.Location = new System.Drawing.Point(136, 37);
+            this.btnPenDown.Location = new System.Drawing.Point(326, 37);
             this.btnPenDown.Name = "btnPenDown";
             this.btnPenDown.Size = new System.Drawing.Size(75, 23);
             this.btnPenDown.TabIndex = 2;
@@ -355,7 +355,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClear.Location = new System.Drawing.Point(6, 8);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(205, 23);
+            this.btnClear.Size = new System.Drawing.Size(395, 23);
             this.btnClear.TabIndex = 0;
             this.btnClear.Text = "Clear...";
             this.btnClear.UseVisualStyleBackColor = true;
@@ -369,7 +369,7 @@
             this.tpProgram.Location = new System.Drawing.Point(23, 4);
             this.tpProgram.Name = "tpProgram";
             this.tpProgram.Padding = new System.Windows.Forms.Padding(3);
-            this.tpProgram.Size = new System.Drawing.Size(217, 681);
+            this.tpProgram.Size = new System.Drawing.Size(407, 681);
             this.tpProgram.TabIndex = 3;
             this.tpProgram.Text = "Program";
             this.tpProgram.UseVisualStyleBackColor = true;
@@ -382,14 +382,14 @@
             this.txtError.Multiline = true;
             this.txtError.Name = "txtError";
             this.txtError.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtError.Size = new System.Drawing.Size(205, 171);
+            this.txtError.Size = new System.Drawing.Size(395, 171);
             this.txtError.TabIndex = 2;
             this.txtError.WordWrap = false;
             // 
             // btnExecute
             // 
             this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExecute.Location = new System.Drawing.Point(136, 474);
+            this.btnExecute.Location = new System.Drawing.Point(326, 474);
             this.btnExecute.Name = "btnExecute";
             this.btnExecute.Size = new System.Drawing.Size(75, 23);
             this.btnExecute.TabIndex = 1;
@@ -403,11 +403,12 @@
             this.txtSourceCode.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtSourceCode.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtSourceCode.Location = new System.Drawing.Point(6, 8);
             this.txtSourceCode.Multiline = true;
             this.txtSourceCode.Name = "txtSourceCode";
             this.txtSourceCode.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtSourceCode.Size = new System.Drawing.Size(205, 460);
+            this.txtSourceCode.Size = new System.Drawing.Size(395, 460);
             this.txtSourceCode.TabIndex = 0;
             this.txtSourceCode.Text = "REPEAT 5[FD 100 RT 144]\r\n\r\n";
             this.txtSourceCode.WordWrap = false;
