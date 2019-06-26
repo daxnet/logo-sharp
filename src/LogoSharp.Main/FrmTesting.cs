@@ -170,6 +170,10 @@ namespace LogoSharp.Main
             {
                 txtError.Text = string.Join(Environment.NewLine, pex.ParsingErrors.Select(x => x.ToString()));
             }
+            catch(RuntimeException rex)
+            {
+                txtError.Text = rex.Message;
+            }
         }
 
         private void btnSave_Click(object sender, EventArgs e)

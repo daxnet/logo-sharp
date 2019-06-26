@@ -410,7 +410,7 @@
             this.txtSourceCode.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtSourceCode.Size = new System.Drawing.Size(395, 460);
             this.txtSourceCode.TabIndex = 0;
-            this.txtSourceCode.Text = "REPEAT 5[FD 100 RT 144]\r\n\r\n";
+            this.txtSourceCode.Text = "TO drawStep\r\nFD 100\r\nRT 90\r\nEND\r\n\r\ndrawStep\r\n";
             this.txtSourceCode.WordWrap = false;
             // 
             // pnlMain

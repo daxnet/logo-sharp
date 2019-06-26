@@ -14,8 +14,6 @@ namespace LogoSharp
             // var integer_number = new NumberLiteral("INTEGER", NumberOptions.AllowSign | NumberOptions.IntOnly);
             var decimal_number = new NumberLiteral("DECIMAL");
 
-            var string_literal = new StringLiteral("STRING");
-
             // integer_number.DefaultIntTypes = new[] { TypeCode.Int16, TypeCode.Int32, TypeCode.Int64 };
             decimal_number.DefaultFloatType = TypeCode.Single;
 
@@ -24,6 +22,7 @@ namespace LogoSharp
 
             // Non terminals
             // 10. Expressions
+            var VARIABLE = new NonTerminal("VARIABLE");
             var EXPRESSION = new NonTerminal("EXPRESSION");
             var BINARY_OPERATOR = new NonTerminal("BINARY_OPERATOR");
             var BINARY_EXPRESSION = new NonTerminal("BINARY_EXPRESSION", typeof(BinaryOperationNode));
@@ -92,6 +91,7 @@ namespace LogoSharp
             var PROCEDURE_BODY = new NonTerminal("PROCEDURE_BODY");
             var PROCEDURE_END = new NonTerminal("PROCEDURE_END");
             var PROCEDURE = new NonTerminal("PROCEDURE");
+            var PROCEDURE_CALL = new NonTerminal("PROCEDURE_CALL");
 
             LSB.Rule = ToTerm("[");
             RSB.Rule = ToTerm("]");
@@ -101,7 +101,9 @@ namespace LogoSharp
             TUPLE.Rule = MakeStarRule(TUPLE, EXPRESSION);
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
-            EXPRESSION.Rule = decimal_number | identifier | FUNCTION_CALL | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
+            VARIABLE.Rule = ":" + identifier;
+
+            EXPRESSION.Rule = decimal_number | VARIABLE | FUNCTION_CALL | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
 
             UNARY_OPERATOR.Rule = ToTerm("-") | "+";
             UNARY_EXPRESSION.Rule = UNARY_OPERATOR + EXPRESSION;
@@ -113,7 +115,7 @@ namespace LogoSharp
             FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(",", "comma"), EXPRESSION);
             FUNCTION_CALL.Rule = identifier + PreferShiftHere() + "(" + FUNCTION_ARGS + ")";
 
-            ASSIGNMENT.Rule = identifier + "=" + EXPRESSION;
+            ASSIGNMENT.Rule = VARIABLE + "=" + EXPRESSION;
 
             LT.Rule = ToTerm("LT") | ToTerm("LEFT");
             RT.Rule = ToTerm("RT") | ToTerm("RIGHT");
@@ -149,7 +151,7 @@ namespace LogoSharp
             BASIC_COMMAND.Rule = DRAWING_COMMAND | PEN_COMMAND | BASIC_CONTROL_COMMAND;
             FLOW_CONTROL_COMMAND.Rule = REPEAT_COMMAND;
 
-            COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND | ASSIGNMENT;
+            COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND | ASSIGNMENT | PROCEDURE_CALL;
             COMMAND.Rule = COMMAND_LINE | Empty + NewLine;
 
             PROCEDURE_DECLARE.Rule = ToTerm("TO") + identifier + NewLine;
@@ -157,6 +159,7 @@ namespace LogoSharp
             PROCEDURE_END.Rule = ToTerm("END") + NewLine;
             PROCEDURE.Rule = PROCEDURE_DECLARE + PROCEDURE_BODY + PROCEDURE_END;
 
+            PROCEDURE_CALL.Rule = identifier;
 
             var COMMANDS = new NonTerminal("COMMANDS");
             COMMANDS.Rule = MakePlusRule(COMMANDS, COMMAND);

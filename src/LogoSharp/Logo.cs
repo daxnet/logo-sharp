@@ -13,25 +13,49 @@ namespace LogoSharp
 {
     public sealed class Logo
     {
+        #region Private Fields
+
+        private static readonly Dictionary<string, object> globalVariables = new Dictionary<string, object>();
+        private static readonly List<Procedure> procedures = new List<Procedure>();
         private static readonly LanguageData language = new LanguageData(new LogoGrammar());
         private static readonly Parser parser = new Parser(language);
-        private static readonly Dictionary<string, object> globalVariables = new Dictionary<string, object>();
+
+        #endregion Private Fields
+
+        #region Public Events
+
+        public event EventHandler<BackwardEventArgs> Backward;
+
+        public event EventHandler ClearScreen;
+
+        public event EventHandler<DelayEventArgs> Delay;
+
+        public event EventHandler<ForwardEventArgs> Forward;
+
+        public event EventHandler GoHome;
+
+        public event EventHandler HideTurtle;
+
+        public event EventHandler PenDown;
+
+        public event EventHandler PenUp;
+
+        public event EventHandler<PenColorEventArgs> SetPenColor;
+
+        public event EventHandler ShowTurtle;
 
         public event EventHandler<TurnLeftEventArgs> TurnLeft;
         public event EventHandler<TurnRightEventArgs> TurnRight;
-        public event EventHandler<ForwardEventArgs> Forward;
-        public event EventHandler<BackwardEventArgs> Backward;
-        public event EventHandler<PenColorEventArgs> SetPenColor;
-        public event EventHandler<DelayEventArgs> Delay;
-        public event EventHandler PenUp;
-        public event EventHandler PenDown;
-        public event EventHandler ClearScreen;
-        public event EventHandler GoHome;
-        public event EventHandler ShowTurtle;
-        public event EventHandler HideTurtle;
+
+        #endregion Public Events
+
+        #region Public Methods
 
         public void Execute(string source)
         {
+            globalVariables.Clear();
+            procedures.Clear();
+
             var syntaxTree = parser.Parse(source);
             if (syntaxTree.HasErrors())
             {
@@ -47,31 +71,151 @@ namespace LogoSharp
             this.ParseTree(syntaxTree.Root);
         }
 
-        private void ParseTree(ParseTreeNode node)
+        public void OnHideTurtle(EventArgs e) => this.HideTurtle?.Invoke(this, e);
+
+        public void OnShowTurtle(EventArgs e) => this.ShowTurtle?.Invoke(this, e);
+
+        public void ParseBasicControlCommand(ParseTreeNode node)
         {
-            switch (node.Term.Name)
+            var commandNode = node.ChildNodes[0];
+            switch (commandNode.Term.Name)
             {
-                case "PROGRAM":
-                    foreach (var child in node.ChildNodes)
+                case "HOME":
+                    this.OnGoHome(EventArgs.Empty);
+                    break;
+                case "SHOWTURTLE":
+                    this.OnShowTurtle(EventArgs.Empty);
+                    break;
+                case "HIDETURTLE":
+                    this.OnHideTurtle(EventArgs.Empty);
+                    break;
+            }
+        }
+
+        #endregion Public Methods
+
+        #region Private Methods
+
+        private Evaluation EvaluateArithmeticExpression(ParseTreeNode expression)
+        {
+            switch (expression.Term.Name)
+            {
+                case "EXPRESSION":
+                    return EvaluateArithmeticExpression(expression.ChildNodes[0]);
+
+                case "VARIABLE":
+                    var variableName = expression.ChildNodes[1].Token.Text;
+                    if (!globalVariables.Any(kvp => kvp.Key.Equals(variableName, StringComparison.InvariantCultureIgnoreCase)))
                     {
-                        this.ParseTree(child);
+                        throw new ParsingException("Variable has not been defined.", new[] { ParsingError.FromParseTreeNode(expression, $"The requested parameter '{variableName}' is not defined.") });
                     }
-                    break;
-                case "DRAWING_COMMAND":
-                    this.ParseDrawingCommand(node);
-                    break;
-                case "BASIC_CONTROL_COMMAND":
-                    this.ParseBasicControlCommand(node);
-                    break;
-                case "PEN_COMMAND":
-                    this.ParsePenCommand(node);
-                    break;
-                case "REPEAT_COMMAND":
-                    this.ParseRepeatCommand(node);
-                    break;
-                case "ASSIGNMENT":
-                    this.ParseAssignment(node);
-                    break;
+
+                    return new ConstantEvaluation(Convert.ToSingle(globalVariables.First(kvp => kvp.Key.Equals(variableName)).Value));
+
+                case "BINARY_EXPRESSION":
+                    var leftNode = expression.ChildNodes[0];
+                    var operatorNode = expression.ChildNodes[1];
+                    var rightNode = expression.ChildNodes[2];
+                    var leftEvaluation = EvaluateArithmeticExpression(leftNode);
+                    var rightEvaluation = EvaluateArithmeticExpression(rightNode);
+                    var binaryOperation = BinaryOperation.Add;
+                    switch (operatorNode.Term.Name)
+                    {
+                        case "+":
+                            binaryOperation = BinaryOperation.Add;
+                            break;
+                        case "-":
+                            binaryOperation = BinaryOperation.Sub;
+                            break;
+                        case "*":
+                            binaryOperation = BinaryOperation.Mul;
+                            break;
+                        case "/":
+                            binaryOperation = BinaryOperation.Div;
+                            break;
+                    }
+                    return new BinaryEvaluation(leftEvaluation, rightEvaluation, binaryOperation);
+
+                case "FUNCTION_CALL":
+                    var funcName = expression.ChildNodes[0].Token.Text;
+                    var funcParameters = new List<float>();
+                    if (expression.ChildNodes.Count > 1)
+                    {
+                        var functionArgsNode = expression.ChildNodes[1];
+                        for (var idx = 0; idx < functionArgsNode.ChildNodes.Count; idx++)
+                        {
+                            funcParameters.Add(EvaluateArithmeticExpression(functionArgsNode.ChildNodes[idx]).Value);
+                        }
+                    }
+                    return FunctionRegistry.Call(expression, funcName, funcParameters);
+
+                default:
+                    return new ConstantEvaluation(Convert.ToSingle(expression.Token.Text));
+            }
+        }
+
+        private void OnBackward(BackwardEventArgs e)
+        {
+            this.Backward?.Invoke(this, e);
+        }
+
+        private void OnClearScreen(EventArgs e)
+        {
+            this.ClearScreen?.Invoke(this, e);
+        }
+
+        private void OnDelay(DelayEventArgs e)
+        {
+            this.Delay?.Invoke(this, e);
+        }
+
+        private void OnForward(ForwardEventArgs e)
+        {
+            this.Forward?.Invoke(this, e);
+        }
+
+        private void OnGoHome(EventArgs e)
+        {
+            this.GoHome?.Invoke(this, e);
+        }
+
+        private void OnPenDown(EventArgs e)
+        {
+            this.PenDown?.Invoke(this, e);
+        }
+
+        private void OnPenUp(EventArgs e)
+        {
+            this.PenUp?.Invoke(this, e);
+        }
+
+        private void OnSetPenColor(PenColorEventArgs e)
+        {
+            this.SetPenColor?.Invoke(this, e);
+        }
+
+        private void OnTurnLeft(TurnLeftEventArgs e)
+        {
+            this.TurnLeft?.Invoke(this, e);
+        }
+
+        private void OnTurnRight(TurnRightEventArgs e)
+        {
+            this.TurnRight?.Invoke(this, e);
+        }
+
+        private void ParseAssignment(ParseTreeNode assignmentNode)
+        {
+            var variable = assignmentNode.ChildNodes[0].ChildNodes[1].Token.Text;
+            var expressionNode = assignmentNode.ChildNodes[2];
+            var expression = EvaluateArithmeticExpression(expressionNode);
+            if (globalVariables.Any(kvp => kvp.Key.Equals(variable, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                globalVariables[variable] = expression.Value;
+            }
+            else
+            {
+                globalVariables.Add(variable, expression.Value);
             }
         }
 
@@ -106,24 +250,7 @@ namespace LogoSharp
                 case "DRAW":
                     this.OnClearScreen(EventArgs.Empty);
                     break;
-                
-            }
-        }
 
-        public void ParseBasicControlCommand(ParseTreeNode node)
-        {
-            var commandNode = node.ChildNodes[0];
-            switch(commandNode.Term.Name)
-            {
-                case "HOME":
-                    this.OnGoHome(EventArgs.Empty);
-                    break;
-                case "SHOWTURTLE":
-                    this.OnShowTurtle(EventArgs.Empty);
-                    break;
-                case "HIDETURTLE":
-                    this.OnHideTurtle(EventArgs.Empty);
-                    break;
             }
         }
 
@@ -179,18 +306,64 @@ namespace LogoSharp
             }
         }
 
-        private void ParseAssignment(ParseTreeNode assignmentNode)
+        private void ParseTree(ParseTreeNode node)
         {
-            var variable = assignmentNode.ChildNodes[0].Token.Text;
-            var expressionNode = assignmentNode.ChildNodes[2];
-            var expression = EvaluateArithmeticExpression(expressionNode);
-            if (globalVariables.Any(kvp => kvp.Key.Equals(variable, StringComparison.InvariantCultureIgnoreCase)))
+            switch (node.Term.Name)
             {
-                globalVariables[variable] = expression.Value;
+                case "PROGRAM":
+                    foreach (var child in node.ChildNodes)
+                    {
+                        this.ParseTree(child);
+                    }
+                    break;
+                case "PROCEDURE":
+                    this.ParseProcedure(node);
+                    break;
+                case "PROCEDURE_BODY":
+                    foreach (var child in node.ChildNodes)
+                    {
+                        this.ParseTree(child);
+                    }
+                    break;
+                case "DRAWING_COMMAND":
+                    this.ParseDrawingCommand(node);
+                    break;
+                case "BASIC_CONTROL_COMMAND":
+                    this.ParseBasicControlCommand(node);
+                    break;
+                case "PEN_COMMAND":
+                    this.ParsePenCommand(node);
+                    break;
+                case "REPEAT_COMMAND":
+                    this.ParseRepeatCommand(node);
+                    break;
+                case "ASSIGNMENT":
+                    this.ParseAssignment(node);
+                    break;
+                case "PROCEDURE_CALL":
+                    this.ParseProcedureCall(node);
+                    break;
+            }
+        }
+
+        private void ParseProcedure(ParseTreeNode procedureNode)
+        {
+            var name = procedureNode.ChildNodes[0].ChildNodes[1].Token.Text;
+            var bodyNode = procedureNode.ChildNodes[1];
+            procedures.Add(new Procedure(name, bodyNode));
+        }
+
+        private void ParseProcedureCall(ParseTreeNode procedureNode)
+        {
+            var callingProcedureName = procedureNode.ChildNodes[0].Token.Text;
+            var procedure = procedures.FirstOrDefault(x => string.Equals(callingProcedureName, x.Name, StringComparison.InvariantCultureIgnoreCase));
+            if (procedure != null)
+            {
+                ParseTree(procedure.Body);
             }
             else
             {
-                globalVariables.Add(variable, expression.Value);
+                throw new RuntimeException($"The calling procedure {callingProcedureName} is not defined.");
             }
         }
 
@@ -198,118 +371,10 @@ namespace LogoSharp
         {
             foreach (var child in tupleNode.ChildNodes)
             {
-                // result.Add(Convert.ToSingle(child.Token.Value));
                 result.Add(EvaluateArithmeticExpression(child).Value);
             }
         }
 
-        private Evaluation EvaluateArithmeticExpression(ParseTreeNode expression)
-        {
-            switch (expression.Term.Name)
-            {
-                case "EXPRESSION":
-                    return EvaluateArithmeticExpression(expression.ChildNodes[0]);
-
-                case "IDENTIFIER":
-                    var variableName = expression.Token.Text;
-                    if (!globalVariables.Any(kvp => kvp.Key.Equals(variableName, StringComparison.InvariantCultureIgnoreCase)))
-                    {
-                        throw new ParsingException("Variable has not been defined.", new[] { ParsingError.FromParseTreeNode(expression, $"The requested parameter '{variableName}' is not defined.") });
-                    }
-
-                    return new ConstantEvaluation(Convert.ToSingle(globalVariables.First(kvp => kvp.Key.Equals(variableName)).Value));
-                case "BINARY_EXPRESSION":
-                    var leftNode = expression.ChildNodes[0];
-                    var operatorNode = expression.ChildNodes[1];
-                    var rightNode = expression.ChildNodes[2];
-                    var leftEvaluation = EvaluateArithmeticExpression(leftNode);
-                    var rightEvaluation = EvaluateArithmeticExpression(rightNode);
-                    var binaryOperation = BinaryOperation.Add;
-                    switch (operatorNode.Term.Name)
-                    {
-                        case "+":
-                            binaryOperation = BinaryOperation.Add;
-                            break;
-                        case "-":
-                            binaryOperation = BinaryOperation.Sub;
-                            break;
-                        case "*":
-                            binaryOperation = BinaryOperation.Mul;
-                            break;
-                        case "/":
-                            binaryOperation = BinaryOperation.Div;
-                            break;
-                    }
-                    return new BinaryEvaluation(leftEvaluation, rightEvaluation, binaryOperation);
-                case "FUNCTION_CALL":
-                    var funcName = expression.ChildNodes[0].Token.Text;
-                    var funcParameters = new List<float>();
-                    if (expression.ChildNodes.Count > 1)
-                    {
-                        var functionArgsNode = expression.ChildNodes[1];
-                        for (var idx = 0; idx < functionArgsNode.ChildNodes.Count; idx++)
-                        {
-                            funcParameters.Add(EvaluateArithmeticExpression(functionArgsNode.ChildNodes[idx]).Value);
-                        }
-                    }
-                    return FunctionRegistry.Call(expression, funcName, funcParameters);
-                default:
-                    return new ConstantEvaluation(Convert.ToSingle(expression.Token.Text));
-            }
-        }
-
-        private void OnTurnLeft(TurnLeftEventArgs e)
-        {
-            this.TurnLeft?.Invoke(this, e);
-        }
-
-        private void OnTurnRight(TurnRightEventArgs e)
-        {
-            this.TurnRight?.Invoke(this, e);
-        }
-
-        private void OnForward(ForwardEventArgs e)
-        {
-            this.Forward?.Invoke(this, e);
-        }
-
-        private void OnBackward(BackwardEventArgs e)
-        {
-            this.Backward?.Invoke(this, e);
-        }
-
-        private void OnPenUp(EventArgs e)
-        {
-            this.PenUp?.Invoke(this, e);
-        }
-
-        private void OnPenDown(EventArgs e)
-        {
-            this.PenDown?.Invoke(this, e);
-        }
-
-        private void OnSetPenColor(PenColorEventArgs e)
-        {
-            this.SetPenColor?.Invoke(this, e);
-        }
-
-        private void OnDelay(DelayEventArgs e)
-        {
-            this.Delay?.Invoke(this, e);
-        }
-
-        private void OnClearScreen(EventArgs e)
-        {
-            this.ClearScreen?.Invoke(this, e);
-        }
-
-        private void OnGoHome(EventArgs e)
-        {
-            this.GoHome?.Invoke(this, e);
-        }
-
-        public void OnShowTurtle(EventArgs e) => this.ShowTurtle?.Invoke(this, e);
-
-        public void OnHideTurtle(EventArgs e) => this.HideTurtle?.Invoke(this, e);
+        #endregion Private Methods
     }
 }
