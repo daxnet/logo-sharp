@@ -28,6 +28,7 @@ namespace LogoSharp
             var BINARY_EXPRESSION = new NonTerminal("BINARY_EXPRESSION", typeof(BinaryOperationNode));
             var UNARY_OPERATOR = new NonTerminal("UNARY_OPERATOR");
             var UNARY_EXPRESSION = new NonTerminal("UNARY_EXPRESSION");
+            var REP_COUNT_EXPRESSION = new NonTerminal("REP_COUNT");
 
             // 15. Assignments
             var ASSIGNMENT = new NonTerminal("ASSIGNMENT");
@@ -102,8 +103,8 @@ namespace LogoSharp
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
             VARIABLE.Rule = ":" + identifier;
-
-            EXPRESSION.Rule = decimal_number | VARIABLE | FUNCTION_CALL | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
+            REP_COUNT_EXPRESSION.Rule = ToTerm("REPCOUNT");
+            EXPRESSION.Rule = decimal_number | VARIABLE | REP_COUNT_EXPRESSION | FUNCTION_CALL | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
 
             UNARY_OPERATOR.Rule = ToTerm("-") | "+";
             UNARY_EXPRESSION.Rule = UNARY_OPERATOR + EXPRESSION;

@@ -19,6 +19,7 @@ namespace LogoSharp
         private static readonly List<Procedure> procedures = new List<Procedure>();
         private static readonly LanguageData language = new LanguageData(new LogoGrammar());
         private static readonly Parser parser = new Parser(language);
+        private int? repeatCount;
 
         #endregion Private Fields
 
@@ -135,6 +136,14 @@ namespace LogoSharp
                             break;
                     }
                     return new BinaryEvaluation(leftEvaluation, rightEvaluation, binaryOperation);
+
+                case "REP_COUNT":
+                    if (repeatCount.HasValue)
+                    {
+                        return new ConstantEvaluation(repeatCount.Value);
+                    }
+
+                    throw new ParsingException("Variable repCount doesn't have a valid value.", new[] { ParsingError.FromParseTreeNode(expression, "Reference to repCount variable is not in a valid REPEAT scope.") });
 
                 case "FUNCTION_CALL":
                     var funcName = expression.ChildNodes[0].Token.Text;
@@ -299,11 +308,14 @@ namespace LogoSharp
             var repeatCount = Convert.ToInt32(EvaluateArithmeticExpression(repeatNode.ChildNodes[1]).Value);
             for (var i = 0; i < repeatCount; i++)
             {
+                this.repeatCount = i + 1;
                 foreach (var childNode in repeatNode.ChildNodes[2].ChildNodes)
                 {
                     this.ParseTree(childNode);
                 }
             }
+
+            this.repeatCount = null;
         }
 
         private void ParseTree(ParseTreeNode node)
