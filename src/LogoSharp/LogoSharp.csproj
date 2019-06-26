@@ -65,6 +65,8 @@
     <Compile Include="EventArguments\TurnLeftEventArgs.cs" />
     <Compile Include="EventArguments\TurnRightEventArgs.cs" />
     <Compile Include="RuntimeException.cs" />
+    <Compile Include="Scopes\ProcedureScope.cs" />
+    <Compile Include="Scopes\Scope.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Irony.Interpreter.NetCore">

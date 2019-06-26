@@ -102,7 +102,7 @@ namespace LogoSharp
             TUPLE.Rule = MakeStarRule(TUPLE, EXPRESSION);
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
-            VARIABLE.Rule = ":" + identifier;
+            VARIABLE.Rule = "\"" + identifier;
             REP_COUNT_EXPRESSION.Rule = ToTerm("REPCOUNT");
             EXPRESSION.Rule = decimal_number | VARIABLE | REP_COUNT_EXPRESSION | FUNCTION_CALL | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
 
@@ -116,7 +116,7 @@ namespace LogoSharp
             FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(",", "comma"), EXPRESSION);
             FUNCTION_CALL.Rule = identifier + PreferShiftHere() + "(" + FUNCTION_ARGS + ")";
 
-            ASSIGNMENT.Rule = VARIABLE + "=" + EXPRESSION;
+            ASSIGNMENT.Rule = "make" + VARIABLE + EXPRESSION;
 
             LT.Rule = ToTerm("LT") | ToTerm("LEFT");
             RT.Rule = ToTerm("RT") | ToTerm("RIGHT");

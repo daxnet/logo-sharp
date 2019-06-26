@@ -3,6 +3,7 @@ using Irony.Parsing;
 using LogoSharp.Evaluations;
 using LogoSharp.Evaluations.Functions;
 using LogoSharp.EventArguments;
+using LogoSharp.Scopes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace LogoSharp
     {
         #region Private Fields
 
-        private static readonly Dictionary<string, object> globalVariables = new Dictionary<string, object>();
+        private static readonly Stack<ProcedureScope> procedureScopes = new Stack<ProcedureScope>();
         private static readonly List<Procedure> procedures = new List<Procedure>();
         private static readonly LanguageData language = new LanguageData(new LogoGrammar());
         private static readonly Parser parser = new Parser(language);
@@ -46,6 +47,7 @@ namespace LogoSharp
         public event EventHandler ShowTurtle;
 
         public event EventHandler<TurnLeftEventArgs> TurnLeft;
+
         public event EventHandler<TurnRightEventArgs> TurnRight;
 
         #endregion Public Events
@@ -54,8 +56,10 @@ namespace LogoSharp
 
         public void Execute(string source)
         {
-            globalVariables.Clear();
+            procedureScopes.Clear();
             procedures.Clear();
+
+            procedureScopes.Push(new ProcedureScope("Root"));
 
             var syntaxTree = parser.Parse(source);
             if (syntaxTree.HasErrors())
@@ -97,6 +101,8 @@ namespace LogoSharp
 
         #region Private Methods
 
+        private ProcedureScope CurrentScope => procedureScopes.Peek();
+
         private Evaluation EvaluateArithmeticExpression(ParseTreeNode expression)
         {
             switch (expression.Term.Name)
@@ -106,12 +112,12 @@ namespace LogoSharp
 
                 case "VARIABLE":
                     var variableName = expression.ChildNodes[1].Token.Text;
-                    if (!globalVariables.Any(kvp => kvp.Key.Equals(variableName, StringComparison.InvariantCultureIgnoreCase)))
+                    if (!CurrentScope.Exists(variableName))
                     {
                         throw new ParsingException("Variable has not been defined.", new[] { ParsingError.FromParseTreeNode(expression, $"The requested parameter '{variableName}' is not defined.") });
                     }
 
-                    return new ConstantEvaluation(Convert.ToSingle(globalVariables.First(kvp => kvp.Key.Equals(variableName)).Value));
+                    return new ConstantEvaluation(Convert.ToSingle(CurrentScope[variableName]));
 
                 case "BINARY_EXPRESSION":
                     var leftNode = expression.ChildNodes[0];
@@ -215,17 +221,10 @@ namespace LogoSharp
 
         private void ParseAssignment(ParseTreeNode assignmentNode)
         {
-            var variable = assignmentNode.ChildNodes[0].ChildNodes[1].Token.Text;
+            var variable = assignmentNode.ChildNodes[1].ChildNodes[1].Token.Text;
             var expressionNode = assignmentNode.ChildNodes[2];
             var expression = EvaluateArithmeticExpression(expressionNode);
-            if (globalVariables.Any(kvp => kvp.Key.Equals(variable, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                globalVariables[variable] = expression.Value;
-            }
-            else
-            {
-                globalVariables.Add(variable, expression.Value);
-            }
+            CurrentScope[variable] = expression.Value;
         }
 
         private void ParseDrawingCommand(ParseTreeNode node)
@@ -371,7 +370,9 @@ namespace LogoSharp
             var procedure = procedures.FirstOrDefault(x => string.Equals(callingProcedureName, x.Name, StringComparison.InvariantCultureIgnoreCase));
             if (procedure != null)
             {
+                procedureScopes.Push(new ProcedureScope(callingProcedureName));
                 ParseTree(procedure.Body);
+                procedureScopes.Pop();
             }
             else
             {
