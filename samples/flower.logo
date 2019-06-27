@@ -1,0 +1,16 @@
+clearScreen
+setPenColor [255 255 0]
+repeat 24 [ repeat 3 [forward 35 right 120] right 15]
+home
+setPenColor [0 255 0]
+back 140
+left 45
+forward 70
+left 10
+back 60
+right 110
+forward 60
+left 10
+back 71
+left 45
+forward 140

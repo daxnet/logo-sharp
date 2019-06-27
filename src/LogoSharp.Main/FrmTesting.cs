@@ -156,10 +156,6 @@ namespace LogoSharp.Main
         private void btnExecute_Click(object sender, EventArgs e)
         {
             var sourceCode = txtSourceCode.Text;
-            if (!sourceCode.EndsWith(Environment.NewLine))
-            {
-                sourceCode += Environment.NewLine;
-            }
 
             try
             {
@@ -169,6 +165,10 @@ namespace LogoSharp.Main
             catch(ParsingException pex)
             {
                 txtError.Text = string.Join(Environment.NewLine, pex.ParsingErrors.Select(x => x.ToString()));
+            }
+            catch(RuntimeException rex)
+            {
+                txtError.Text = rex.Message;
             }
         }
 
