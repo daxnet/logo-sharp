@@ -11,7 +11,7 @@ namespace LogoSharp
             : base(false)
         {
             // Literals
-            // var integer_number = new NumberLiteral("INTEGER", NumberOptions.AllowSign | NumberOptions.IntOnly);
+            var integer_number = new NumberLiteral("INTEGER", NumberOptions.AllowSign | NumberOptions.IntOnly);
             var decimal_number = new NumberLiteral("DECIMAL");
 
             // integer_number.DefaultIntTypes = new[] { TypeCode.Int16, TypeCode.Int32, TypeCode.Int64 };
@@ -66,6 +66,9 @@ namespace LogoSharp
             var BASIC_CONTROL_COMMAND = new NonTerminal("BASIC_CONTROL_COMMAND");
 
             // 250. Pen commands
+            var COLOR_VALUE = new NonTerminal("COLOR_VALUE");
+            var COLOR_VALUE_TUPLE = new NonTerminal("COLOR_VALUE_TUPLE");
+
             var PC = new NonTerminal("PEN_COLOR");
             var PE = new NonTerminal("PEN_ERASE");
             var PN = new NonTerminal("PEN_NORMAL");
@@ -136,13 +139,16 @@ namespace LogoSharp
                 DELAY + decimal_number | DRAW;
             BASIC_CONTROL_COMMAND.Rule = HOME | SHOW_TURTLE | HIDE_TURTLE;
 
+            COLOR_VALUE_TUPLE.Rule = TUPLEARGS;
+            COLOR_VALUE.Rule = COLOR_VALUE_TUPLE | EXPRESSION;
+
             PC.Rule = ToTerm("SETPENCOLOR") | "SETPC" | "PC";
             PE.Rule = ToTerm("PENERASE") | "PE";
             PN.Rule = ToTerm("PENNORMAL") | "PN";
             PEN_DOWN.Rule = ToTerm("PD") | "PENDOWN";
             PEN_UP.Rule = ToTerm("PU") | "PENUP";
             SET_PEN_SIZE.Rule = ToTerm("SETPENSIZE") + TUPLEARGS;
-            SET_PEN_COLOR.Rule = PC + TUPLEARGS;
+            SET_PEN_COLOR.Rule = PC + COLOR_VALUE;
             PEN_COMMAND.Rule = PEN_DOWN | PEN_UP | SET_PEN_COLOR | SET_PEN_SIZE | PE | PN;
 
             // REPEAT_BODY.Rule = REPEAT_BODY + BASIC_COMMAND | BASIC_COMMAND;
@@ -186,6 +192,8 @@ namespace LogoSharp
 
             MarkTransient(COMMAND,
                 COMMAND_LINE,
+                COLOR_VALUE,
+                COLOR_VALUE_TUPLE,
                 BASIC_COMMAND,
                 FLOW_CONTROL_COMMAND,
                 TUPLEARGS,

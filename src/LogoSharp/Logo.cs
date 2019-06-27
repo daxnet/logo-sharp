@@ -17,10 +17,29 @@ namespace LogoSharp
         #region Private Fields
 
         private static readonly Stack<ProcedureScope> procedureScopes = new Stack<ProcedureScope>();
+        private static readonly Stack<RepeatScope> repeatScopes = new Stack<RepeatScope>();
         private static readonly List<Procedure> procedures = new List<Procedure>();
         private static readonly LanguageData language = new LanguageData(new LogoGrammar());
         private static readonly Parser parser = new Parser(language);
-        private int? repeatCount;
+        private static readonly Dictionary<int, Tuple<int, int, int>> colorTable = new Dictionary<int, Tuple<int, int, int>>
+        {
+            { 0, new Tuple<int, int, int>(0, 0, 0) },
+            { 1, new Tuple<int, int, int>(0, 0, 255) },
+            { 2, new Tuple<int, int, int>(0, 255, 0) },
+            { 3, new Tuple<int, int, int>(0, 2255, 255) },
+            { 4, new Tuple<int, int, int>(255, 0, 0) },
+            { 5, new Tuple<int, int, int>(255, 0, 255) },
+            { 6, new Tuple<int, int, int>(255, 255, 0) },
+            { 7, new Tuple<int, int, int>(255, 255, 255) },
+            { 8, new Tuple<int, int, int>(155, 96, 59) },
+            { 9, new Tuple<int, int, int>(197,136, 18) },
+            { 10, new Tuple<int, int, int>(100, 162, 64) },
+            { 11, new Tuple<int, int, int>(120, 187, 187) },
+            { 12, new Tuple<int, int, int>(255, 149, 119) },
+            { 13, new Tuple<int, int, int>(144, 113, 208) },
+            { 14, new Tuple<int, int, int>(255, 163, 0) },
+            { 15, new Tuple<int, int, int>(183, 183, 183) }
+        };
 
         #endregion Private Fields
 
@@ -101,7 +120,9 @@ namespace LogoSharp
 
         #region Private Methods
 
-        private ProcedureScope CurrentScope => procedureScopes.Peek();
+        private ProcedureScope CurrentProcedureScope => procedureScopes.Peek();
+
+        private RepeatScope CurrentRepeatScope => repeatScopes.Count > 0 ? repeatScopes.Peek() : null;
 
         private Evaluation EvaluateArithmeticExpression(ParseTreeNode expression)
         {
@@ -112,12 +133,12 @@ namespace LogoSharp
 
                 case "VARIABLE":
                     var variableName = expression.ChildNodes[1].Token.Text;
-                    if (!CurrentScope.Exists(variableName))
+                    if (!CurrentProcedureScope.Exists(variableName))
                     {
                         throw new ParsingException("Variable has not been defined.", new[] { ParsingError.FromParseTreeNode(expression, $"The requested parameter '{variableName}' is not defined.") });
                     }
 
-                    return new ConstantEvaluation(Convert.ToSingle(CurrentScope[variableName]));
+                    return new ConstantEvaluation(Convert.ToSingle(CurrentProcedureScope[variableName]));
 
                 case "BINARY_EXPRESSION":
                     var leftNode = expression.ChildNodes[0];
@@ -144,9 +165,9 @@ namespace LogoSharp
                     return new BinaryEvaluation(leftEvaluation, rightEvaluation, binaryOperation);
 
                 case "REP_COUNT":
-                    if (repeatCount.HasValue)
+                    if (CurrentRepeatScope != null)
                     {
-                        return new ConstantEvaluation(repeatCount.Value);
+                        return new ConstantEvaluation(CurrentRepeatScope.RepCount);
                     }
 
                     throw new ParsingException("Variable repCount doesn't have a valid value.", new[] { ParsingError.FromParseTreeNode(expression, "Reference to repCount variable is not in a valid REPEAT scope.") });
@@ -224,7 +245,7 @@ namespace LogoSharp
             var variable = assignmentNode.ChildNodes[1].ChildNodes[1].Token.Text;
             var expressionNode = assignmentNode.ChildNodes[2];
             var expression = EvaluateArithmeticExpression(expressionNode);
-            CurrentScope[variable] = expression.Value;
+            CurrentProcedureScope[variable] = expression.Value;
         }
 
         private void ParseDrawingCommand(ParseTreeNode node)
@@ -274,25 +295,37 @@ namespace LogoSharp
                     this.OnPenDown(EventArgs.Empty);
                     break;
                 case "SET_PEN_COLOR":
-                    var rgb = new List<float>();
-                    ParseTupleValues(commandNode.ChildNodes[1], rgb);
-                    if (rgb.Count != 3)
+                    switch (commandNode.ChildNodes[1].Term.Name)
                     {
-                        throw new ParsingException("Incorrect command invocation.", new[]
-                        {
-                            ParsingError.FromParseTreeNode(node, $"The number of arguments must be 3, instead of {rgb.Count}.")
-                        });
+                        case "TUPLE":
+                            var rgb = new List<float>();
+                            ParseTupleValues(commandNode.ChildNodes[1], rgb);
+                            if (rgb.Count != 3)
+                            {
+                                throw new ParsingException("Incorrect command invocation.", new[]
+                                {
+                                    ParsingError.FromParseTreeNode(node, $"The number of arguments must be 3, instead of {rgb.Count}.")
+                                });
+                            }
+
+                            if (rgb.Any(v => v < 0 || v > 255))
+                            {
+                                throw new ParsingException("Command parameters are out of range.", new[]
+                                {
+                                    ParsingError.FromParseTreeNode(node, "The parameter value should be greater than or equal to 0 and less than or equal to 255.")
+                                });
+                            }
+
+                            this.OnSetPenColor(new PenColorEventArgs(Convert.ToInt32(rgb[0]), Convert.ToInt32(rgb[1]), Convert.ToInt32(rgb[2])));
+                            break;
+                        case "EXPRESSION":
+                            var evaluation = this.EvaluateArithmeticExpression(commandNode.ChildNodes[1]);
+                            var colorIndex = Convert.ToInt32(evaluation.Value) % 16;
+                            var colorValue = colorTable[colorIndex];
+                            this.OnSetPenColor(new PenColorEventArgs(colorValue.Item1, colorValue.Item2, colorValue.Item3));
+                            break;
                     }
 
-                    if (rgb.Any(v => v < 0 || v > 255))
-                    {
-                        throw new ParsingException("Command parameters are out of range.", new[]
-                        {
-                            ParsingError.FromParseTreeNode(node, "The parameter value should be greater than or equal to 0 and less than or equal to 255.")
-                        });
-                    }
-
-                    this.OnSetPenColor(new PenColorEventArgs(Convert.ToInt32(rgb[0]), Convert.ToInt32(rgb[1]), Convert.ToInt32(rgb[2])));
                     break;
             }
         }
@@ -305,16 +338,17 @@ namespace LogoSharp
             }
 
             var repeatCount = Convert.ToInt32(EvaluateArithmeticExpression(repeatNode.ChildNodes[1]).Value);
+            repeatScopes.Push(new RepeatScope(Guid.NewGuid().ToString()));
             for (var i = 0; i < repeatCount; i++)
             {
-                this.repeatCount = i + 1;
+                CurrentRepeatScope.RepCount = i + 1;
                 foreach (var childNode in repeatNode.ChildNodes[2].ChildNodes)
                 {
                     this.ParseTree(childNode);
                 }
             }
 
-            this.repeatCount = null;
+            repeatScopes.Pop();
         }
 
         private void ParseTree(ParseTreeNode node)
