@@ -26,7 +26,7 @@ namespace LogoSharp
             { 0, new Tuple<int, int, int>(0, 0, 0) },
             { 1, new Tuple<int, int, int>(0, 0, 255) },
             { 2, new Tuple<int, int, int>(0, 255, 0) },
-            { 3, new Tuple<int, int, int>(0, 2255, 255) },
+            { 3, new Tuple<int, int, int>(0, 255, 255) },
             { 4, new Tuple<int, int, int>(255, 0, 0) },
             { 5, new Tuple<int, int, int>(255, 0, 255) },
             { 6, new Tuple<int, int, int>(255, 255, 0) },

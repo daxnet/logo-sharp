@@ -10,12 +10,14 @@ namespace LogoSharp
         public LogoGrammar()
             : base(false)
         {
-            // Literals
-            var integer_number = new NumberLiteral("INTEGER", NumberOptions.AllowSign | NumberOptions.IntOnly);
-            var decimal_number = new NumberLiteral("DECIMAL");
+            LanguageFlags |= LanguageFlags.NewLineBeforeEOF;
 
-            // integer_number.DefaultIntTypes = new[] { TypeCode.Int16, TypeCode.Int32, TypeCode.Int64 };
-            decimal_number.DefaultFloatType = TypeCode.Single;
+            // Literals
+            var decimal_number = new NumberLiteral("DECIMAL")
+            {
+                // integer_number.DefaultIntTypes = new[] { TypeCode.Int16, TypeCode.Int32, TypeCode.Int64 };
+                DefaultFloatType = TypeCode.Single
+            };
 
             // identifiers
             var identifier = new IdentifierTerminal("IDENTIFIER");
@@ -47,7 +49,6 @@ namespace LogoSharp
             var PROGRAM = new NonTerminal("PROGRAM");
 
             // 150. Tuples
-            var TUPLE_ELEMENT = new NonTerminal("TUPLE_ELEMENT");
             var TUPLE = new NonTerminal("TUPLE");
             var TUPLEARGS = new NonTerminal("TUPLEARGS");
 
@@ -115,7 +116,6 @@ namespace LogoSharp
             BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
             BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
 
-            // PC [A (255+3) B]
             FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(",", "comma"), EXPRESSION);
             FUNCTION_CALL.Rule = identifier + PreferShiftHere() + "(" + FUNCTION_ARGS + ")";
 
