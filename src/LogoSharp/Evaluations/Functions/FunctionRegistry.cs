@@ -41,14 +41,6 @@ namespace LogoSharp.Evaluations.Functions
                     });
             }
 
-            if (!function.ValidateParameters())
-            {
-                throw new ParsingException($"Function call '{functionName}' as unsuccessful.",
-                    new[] {
-                        ParsingError.FromParseTreeNode(node, "The given parameters don't match the function definition.")
-                    });
-            }
-
             return new ConstantEvaluation(function.Value);
         }
     }

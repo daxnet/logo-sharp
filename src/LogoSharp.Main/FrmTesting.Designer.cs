@@ -59,6 +59,8 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.btnLoad = new System.Windows.Forms.Button();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -87,7 +89,7 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.pnlMain);
-            this.splitContainer.Size = new System.Drawing.Size(1116, 689);
+            this.splitContainer.Size = new System.Drawing.Size(1116, 636);
             this.splitContainer.SplitterDistance = 434;
             this.splitContainer.TabIndex = 0;
             // 
@@ -102,7 +104,7 @@
             this.tabControl.Multiline = true;
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(434, 689);
+            this.tabControl.Size = new System.Drawing.Size(434, 636);
             this.tabControl.TabIndex = 0;
             // 
             // tabPage2
@@ -112,10 +114,10 @@
             this.tabPage2.Controls.Add(this.grpMoving);
             this.tabPage2.Controls.Add(this.btnReset);
             this.tabPage2.Controls.Add(this.grpDirection);
-            this.tabPage2.Location = new System.Drawing.Point(23, 4);
+            this.tabPage2.Location = new System.Drawing.Point(22, 4);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(407, 681);
+            this.tabPage2.Size = new System.Drawing.Size(408, 628);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Turtle";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -123,9 +125,9 @@
             // btnHide
             // 
             this.btnHide.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHide.Location = new System.Drawing.Point(326, 37);
+            this.btnHide.Location = new System.Drawing.Point(327, 34);
             this.btnHide.Name = "btnHide";
-            this.btnHide.Size = new System.Drawing.Size(75, 23);
+            this.btnHide.Size = new System.Drawing.Size(75, 21);
             this.btnHide.TabIndex = 8;
             this.btnHide.Text = "Hide";
             this.btnHide.UseVisualStyleBackColor = true;
@@ -133,9 +135,9 @@
             // 
             // btnShow
             // 
-            this.btnShow.Location = new System.Drawing.Point(6, 37);
+            this.btnShow.Location = new System.Drawing.Point(6, 34);
             this.btnShow.Name = "btnShow";
-            this.btnShow.Size = new System.Drawing.Size(75, 23);
+            this.btnShow.Size = new System.Drawing.Size(75, 21);
             this.btnShow.TabIndex = 7;
             this.btnShow.Text = "Show";
             this.btnShow.UseVisualStyleBackColor = true;
@@ -149,9 +151,9 @@
             this.grpMoving.Controls.Add(this.btnForward);
             this.grpMoving.Controls.Add(this.numSteps);
             this.grpMoving.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.grpMoving.Location = new System.Drawing.Point(6, 152);
+            this.grpMoving.Location = new System.Drawing.Point(6, 140);
             this.grpMoving.Name = "grpMoving";
-            this.grpMoving.Size = new System.Drawing.Size(395, 100);
+            this.grpMoving.Size = new System.Drawing.Size(396, 92);
             this.grpMoving.TabIndex = 6;
             this.grpMoving.TabStop = false;
             this.grpMoving.Text = "Moving";
@@ -159,9 +161,9 @@
             // btnBackward
             // 
             this.btnBackward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBackward.Location = new System.Drawing.Point(314, 45);
+            this.btnBackward.Location = new System.Drawing.Point(315, 42);
             this.btnBackward.Name = "btnBackward";
-            this.btnBackward.Size = new System.Drawing.Size(75, 23);
+            this.btnBackward.Size = new System.Drawing.Size(75, 21);
             this.btnBackward.TabIndex = 2;
             this.btnBackward.Text = "Backward";
             this.btnBackward.UseVisualStyleBackColor = true;
@@ -169,9 +171,9 @@
             // 
             // btnForward
             // 
-            this.btnForward.Location = new System.Drawing.Point(6, 45);
+            this.btnForward.Location = new System.Drawing.Point(6, 42);
             this.btnForward.Name = "btnForward";
-            this.btnForward.Size = new System.Drawing.Size(75, 23);
+            this.btnForward.Size = new System.Drawing.Size(75, 21);
             this.btnForward.TabIndex = 1;
             this.btnForward.Text = "Forward";
             this.btnForward.UseVisualStyleBackColor = true;
@@ -186,14 +188,14 @@
             0,
             0,
             0});
-            this.numSteps.Location = new System.Drawing.Point(6, 19);
+            this.numSteps.Location = new System.Drawing.Point(6, 18);
             this.numSteps.Maximum = new decimal(new int[] {
             300,
             0,
             0,
             0});
             this.numSteps.Name = "numSteps";
-            this.numSteps.Size = new System.Drawing.Size(383, 20);
+            this.numSteps.Size = new System.Drawing.Size(384, 20);
             this.numSteps.TabIndex = 0;
             this.numSteps.Value = new decimal(new int[] {
             100,
@@ -205,9 +207,9 @@
             // 
             this.btnReset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReset.Location = new System.Drawing.Point(6, 8);
+            this.btnReset.Location = new System.Drawing.Point(6, 7);
             this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(395, 23);
+            this.btnReset.Size = new System.Drawing.Size(396, 21);
             this.btnReset.TabIndex = 5;
             this.btnReset.Text = "Reset";
             this.btnReset.UseVisualStyleBackColor = true;
@@ -220,9 +222,9 @@
             this.grpDirection.Controls.Add(this.btnTurnRight);
             this.grpDirection.Controls.Add(this.btnTurnLeft);
             this.grpDirection.Controls.Add(this.numAngle);
-            this.grpDirection.Location = new System.Drawing.Point(6, 66);
+            this.grpDirection.Location = new System.Drawing.Point(6, 61);
             this.grpDirection.Name = "grpDirection";
-            this.grpDirection.Size = new System.Drawing.Size(395, 80);
+            this.grpDirection.Size = new System.Drawing.Size(396, 74);
             this.grpDirection.TabIndex = 4;
             this.grpDirection.TabStop = false;
             this.grpDirection.Text = "Direction";
@@ -230,9 +232,9 @@
             // btnTurnRight
             // 
             this.btnTurnRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTurnRight.Location = new System.Drawing.Point(314, 45);
+            this.btnTurnRight.Location = new System.Drawing.Point(315, 42);
             this.btnTurnRight.Name = "btnTurnRight";
-            this.btnTurnRight.Size = new System.Drawing.Size(75, 23);
+            this.btnTurnRight.Size = new System.Drawing.Size(75, 21);
             this.btnTurnRight.TabIndex = 2;
             this.btnTurnRight.Text = "Turn Right";
             this.btnTurnRight.UseVisualStyleBackColor = true;
@@ -240,9 +242,9 @@
             // 
             // btnTurnLeft
             // 
-            this.btnTurnLeft.Location = new System.Drawing.Point(6, 45);
+            this.btnTurnLeft.Location = new System.Drawing.Point(6, 42);
             this.btnTurnLeft.Name = "btnTurnLeft";
-            this.btnTurnLeft.Size = new System.Drawing.Size(75, 23);
+            this.btnTurnLeft.Size = new System.Drawing.Size(75, 21);
             this.btnTurnLeft.TabIndex = 1;
             this.btnTurnLeft.Text = "Turn Left";
             this.btnTurnLeft.UseVisualStyleBackColor = true;
@@ -257,14 +259,14 @@
             0,
             0,
             0});
-            this.numAngle.Location = new System.Drawing.Point(6, 19);
+            this.numAngle.Location = new System.Drawing.Point(6, 18);
             this.numAngle.Maximum = new decimal(new int[] {
             359,
             0,
             0,
             0});
             this.numAngle.Name = "numAngle";
-            this.numAngle.Size = new System.Drawing.Size(383, 20);
+            this.numAngle.Size = new System.Drawing.Size(384, 21);
             this.numAngle.TabIndex = 0;
             this.numAngle.Value = new decimal(new int[] {
             30,
@@ -281,10 +283,10 @@
             this.tpDrawing.Controls.Add(this.btnPenDown);
             this.tpDrawing.Controls.Add(this.btnPenUp);
             this.tpDrawing.Controls.Add(this.btnClear);
-            this.tpDrawing.Location = new System.Drawing.Point(23, 4);
+            this.tpDrawing.Location = new System.Drawing.Point(22, 4);
             this.tpDrawing.Name = "tpDrawing";
             this.tpDrawing.Padding = new System.Windows.Forms.Padding(3);
-            this.tpDrawing.Size = new System.Drawing.Size(407, 681);
+            this.tpDrawing.Size = new System.Drawing.Size(408, 628);
             this.tpDrawing.TabIndex = 2;
             this.tpDrawing.Text = "Drawing";
             this.tpDrawing.UseVisualStyleBackColor = true;
@@ -293,9 +295,9 @@
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(9, 126);
+            this.btnSave.Location = new System.Drawing.Point(9, 116);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(392, 23);
+            this.btnSave.Size = new System.Drawing.Size(393, 21);
             this.btnSave.TabIndex = 10;
             this.btnSave.Text = "Save Image...";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -303,9 +305,9 @@
             // 
             // btnChoose
             // 
-            this.btnChoose.Location = new System.Drawing.Point(90, 79);
+            this.btnChoose.Location = new System.Drawing.Point(90, 73);
             this.btnChoose.Name = "btnChoose";
-            this.btnChoose.Size = new System.Drawing.Size(75, 23);
+            this.btnChoose.Size = new System.Drawing.Size(75, 21);
             this.btnChoose.TabIndex = 5;
             this.btnChoose.Text = "Choose...";
             this.btnChoose.UseVisualStyleBackColor = true;
@@ -314,26 +316,26 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 84);
+            this.label1.Location = new System.Drawing.Point(6, 78);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 13);
+            this.label1.Size = new System.Drawing.Size(65, 12);
             this.label1.TabIndex = 4;
             this.label1.Text = "Pen Color:";
             // 
             // lblColor
             // 
             this.lblColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblColor.Location = new System.Drawing.Point(68, 83);
+            this.lblColor.Location = new System.Drawing.Point(68, 77);
             this.lblColor.Name = "lblColor";
-            this.lblColor.Size = new System.Drawing.Size(16, 16);
+            this.lblColor.Size = new System.Drawing.Size(16, 15);
             this.lblColor.TabIndex = 3;
             // 
             // btnPenDown
             // 
             this.btnPenDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnPenDown.Location = new System.Drawing.Point(326, 37);
+            this.btnPenDown.Location = new System.Drawing.Point(327, 34);
             this.btnPenDown.Name = "btnPenDown";
-            this.btnPenDown.Size = new System.Drawing.Size(75, 23);
+            this.btnPenDown.Size = new System.Drawing.Size(75, 21);
             this.btnPenDown.TabIndex = 2;
             this.btnPenDown.Text = "Pen Down";
             this.btnPenDown.UseVisualStyleBackColor = true;
@@ -341,9 +343,9 @@
             // 
             // btnPenUp
             // 
-            this.btnPenUp.Location = new System.Drawing.Point(6, 37);
+            this.btnPenUp.Location = new System.Drawing.Point(6, 34);
             this.btnPenUp.Name = "btnPenUp";
-            this.btnPenUp.Size = new System.Drawing.Size(75, 23);
+            this.btnPenUp.Size = new System.Drawing.Size(75, 21);
             this.btnPenUp.TabIndex = 1;
             this.btnPenUp.Text = "Pen Up";
             this.btnPenUp.UseVisualStyleBackColor = true;
@@ -353,9 +355,9 @@
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClear.Location = new System.Drawing.Point(6, 8);
+            this.btnClear.Location = new System.Drawing.Point(6, 7);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(395, 23);
+            this.btnClear.Size = new System.Drawing.Size(396, 21);
             this.btnClear.TabIndex = 0;
             this.btnClear.Text = "Clear...";
             this.btnClear.UseVisualStyleBackColor = true;
@@ -363,13 +365,14 @@
             // 
             // tpProgram
             // 
+            this.tpProgram.Controls.Add(this.btnLoad);
             this.tpProgram.Controls.Add(this.txtError);
             this.tpProgram.Controls.Add(this.btnExecute);
             this.tpProgram.Controls.Add(this.txtSourceCode);
-            this.tpProgram.Location = new System.Drawing.Point(23, 4);
+            this.tpProgram.Location = new System.Drawing.Point(22, 4);
             this.tpProgram.Name = "tpProgram";
             this.tpProgram.Padding = new System.Windows.Forms.Padding(3);
-            this.tpProgram.Size = new System.Drawing.Size(407, 681);
+            this.tpProgram.Size = new System.Drawing.Size(408, 628);
             this.tpProgram.TabIndex = 3;
             this.tpProgram.Text = "Program";
             this.tpProgram.UseVisualStyleBackColor = true;
@@ -378,20 +381,20 @@
             // 
             this.txtError.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtError.Location = new System.Drawing.Point(6, 502);
+            this.txtError.Location = new System.Drawing.Point(6, 463);
             this.txtError.Multiline = true;
             this.txtError.Name = "txtError";
             this.txtError.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtError.Size = new System.Drawing.Size(395, 171);
+            this.txtError.Size = new System.Drawing.Size(396, 158);
             this.txtError.TabIndex = 2;
             this.txtError.WordWrap = false;
             // 
             // btnExecute
             // 
             this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExecute.Location = new System.Drawing.Point(326, 474);
+            this.btnExecute.Location = new System.Drawing.Point(327, 438);
             this.btnExecute.Name = "btnExecute";
-            this.btnExecute.Size = new System.Drawing.Size(75, 23);
+            this.btnExecute.Size = new System.Drawing.Size(75, 21);
             this.btnExecute.TabIndex = 1;
             this.btnExecute.Text = "Execute";
             this.btnExecute.UseVisualStyleBackColor = true;
@@ -404,11 +407,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSourceCode.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSourceCode.Location = new System.Drawing.Point(6, 8);
+            this.txtSourceCode.Location = new System.Drawing.Point(6, 7);
             this.txtSourceCode.Multiline = true;
             this.txtSourceCode.Name = "txtSourceCode";
             this.txtSourceCode.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtSourceCode.Size = new System.Drawing.Size(395, 460);
+            this.txtSourceCode.Size = new System.Drawing.Size(396, 425);
             this.txtSourceCode.TabIndex = 0;
             this.txtSourceCode.Text = "TO drawStep\r\nFD 100\r\nRT 90\r\nEND\r\n\r\ndrawStep\r\n";
             this.txtSourceCode.WordWrap = false;
@@ -420,9 +423,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlMain.BackColor = System.Drawing.Color.White;
             this.pnlMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlMain.Location = new System.Drawing.Point(13, 12);
+            this.pnlMain.Location = new System.Drawing.Point(13, 11);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(653, 665);
+            this.pnlMain.Size = new System.Drawing.Size(653, 614);
             this.pnlMain.TabIndex = 1;
             // 
             // timer1
@@ -437,11 +440,27 @@
             this.saveFileDialog1.Filter = "PNG Files (*.png)|*.png";
             this.saveFileDialog1.Title = "Save the current drawing";
             // 
+            // btnLoad
+            // 
+            this.btnLoad.Location = new System.Drawing.Point(6, 437);
+            this.btnLoad.Name = "btnLoad";
+            this.btnLoad.Size = new System.Drawing.Size(75, 23);
+            this.btnLoad.TabIndex = 3;
+            this.btnLoad.Text = "Load";
+            this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.BtnLoad_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.DefaultExt = "logo";
+            this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog1.Filter = "Logo Program (*.logo)|*.logo";
+            // 
             // FrmTesting
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1116, 689);
+            this.ClientSize = new System.Drawing.Size(1116, 636);
             this.Controls.Add(this.splitContainer);
             this.Name = "FrmTesting";
             this.Text = "Testing Form";
@@ -495,6 +514,8 @@
         private System.Windows.Forms.TextBox txtError;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.Button btnLoad;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LogoSharp.Evaluations.Functions
 {
-    [Function("PI")]
+    [Function("PI", 1)]
     internal sealed class MathPiFunction : FunctionEvaluation
     {
         public MathPiFunction(IEnumerable<float> parameterValues) : base(parameterValues)
@@ -14,7 +14,5 @@ namespace LogoSharp.Evaluations.Functions
         }
 
         public override float Value => Convert.ToSingle(Math.PI);
-
-        public override bool ValidateParameters() => this.parameterValues.Count() == 0;
     }
 }

@@ -10,7 +10,7 @@ namespace LogoSharp
         public LogoGrammar()
             : base(false)
         {
-            LanguageFlags |= LanguageFlags.NewLineBeforeEOF;
+            // LanguageFlags |= LanguageFlags.NewLineBeforeEOF;
 
             // Literals
             var decimal_number = new NumberLiteral("DECIMAL")
@@ -21,6 +21,10 @@ namespace LogoSharp
 
             // identifiers
             var identifier = new IdentifierTerminal("IDENTIFIER");
+
+            // comments
+            var COMMENT = new CommentTerminal("COMMENT", ";", "\r", "\n", "\u2085", "\u2028", "\u2029");
+            NonGrammarTerminals.Add(COMMENT);
 
             // Non terminals
             // 10. Expressions
@@ -36,7 +40,7 @@ namespace LogoSharp
             // 15. Assignments
             var ASSIGNMENT = new NonTerminal("ASSIGNMENT");
 
-            // 18. Procedures
+            // 20. Procedures
             var PROCEDURE_DECLARE = new NonTerminal("PROCEDURE_DECLARE");
             var PROCEDURE_BODY = new NonTerminal("PROCEDURE_BODY");
             var PROCEDURE_END = new NonTerminal("PROCEDURE_END");
@@ -45,10 +49,6 @@ namespace LogoSharp
             var PROCEDURE_CALL_ARGUMENTS = new NonTerminal("PROCEDURE_CALL_ARGUMENTS");
             var PROCEDURE_ARGUMENT = new NonTerminal("PROCEDURE_ARGUMENT");
             var PROCEDURE_ARGUMENTS = new NonTerminal("PROCEDURE_ARGUMENTS");
-
-            // 20. Function calls
-            //var FUNCTION_ARGS = new NonTerminal("FUNCTION_ARGS");
-            //var FUNCTION_CALL = new NonTerminal("FUNCTION_CALL");
 
             // 50. Basic
             var LSB = new NonTerminal("LEFT_SQUARE_BRACKET");
@@ -116,16 +116,13 @@ namespace LogoSharp
             REP_COUNT_EXPRESSION.Rule = ToTerm("REPCOUNT");
             VARIABLE_REF.Rule = ":" + identifier;
 
-            EXPRESSION.Rule = decimal_number | VARIABLE_REF | REP_COUNT_EXPRESSION /*| FUNCTION_CALL*/ | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
+            EXPRESSION.Rule = decimal_number | VARIABLE_REF | REP_COUNT_EXPRESSION | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
 
             UNARY_OPERATOR.Rule = ToTerm("-") | "+";
             UNARY_EXPRESSION.Rule = UNARY_OPERATOR + EXPRESSION;
 
             BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
             BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
-
-            //FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, EXPRESSION);
-            //FUNCTION_CALL.Rule = "call" + identifier + "(" + FUNCTION_ARGS + ")" + NewLine;
 
             ASSIGNMENT.Rule = "make" + VARIABLE + EXPRESSION;
 
@@ -159,7 +156,6 @@ namespace LogoSharp
             SET_PEN_COLOR.Rule = PC + COLOR_VALUE;
             PEN_COMMAND.Rule = PEN_DOWN | PEN_UP | SET_PEN_COLOR | SET_PEN_SIZE | PE | PN;
 
-            // REPEAT_BODY.Rule = REPEAT_BODY + BASIC_COMMAND | BASIC_COMMAND;
             REPEAT_BODY.Rule = MakeStarRule(REPEAT_BODY, COMMAND_LINE);
             REPEAT_COMMAND.Rule = ToTerm("REPEAT") + EXPRESSION + LSB + REPEAT_BODY + RSB;
 

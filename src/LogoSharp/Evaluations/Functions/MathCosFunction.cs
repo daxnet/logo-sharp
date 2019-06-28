@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LogoSharp.Evaluations.Functions
 {
-    [Function("COS")]
+    [Function("COS", 1)]
     internal sealed class MathCosFunction : FunctionEvaluation
     {
         public MathCosFunction(IEnumerable<float> parameterValues) : base(parameterValues)
@@ -14,10 +14,5 @@ namespace LogoSharp.Evaluations.Functions
         }
 
         public override float Value => Convert.ToSingle(Math.Cos(parameterValues.First()));
-
-        public override bool ValidateParameters()
-        {
-            return this.parameterValues.Count() == 1;
-        }
     }
 }

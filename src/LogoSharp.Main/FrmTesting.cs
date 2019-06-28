@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace LogoSharp.Main
         public FrmTesting()
         {
             InitializeComponent();
+            this.tabControl.SelectedTab = tpProgram;
             this.turtle = new Turtle(this.pnlMain);
             this.turtle.SetPenWidth(2.0F);
             this.turtle.Reset();
@@ -177,6 +179,15 @@ namespace LogoSharp.Main
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 this.turtle.Save(saveFileDialog1.FileName);
+            }
+        }
+
+        private void BtnLoad_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                var logo = File.ReadAllText(openFileDialog1.FileName);
+                txtSourceCode.Text = logo;
             }
         }
     }

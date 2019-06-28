@@ -182,21 +182,20 @@ namespace LogoSharp
                     {
                         return new ConstantEvaluation(CurrentRepeatScope.RepCount);
                     }
-
                     throw new ParsingException("Variable repCount doesn't have a valid value.", new[] { ParsingError.FromParseTreeNode(expression, "Reference to repCount variable is not in a valid REPEAT scope.") });
 
-                case "FUNCTION_CALL":
-                    var funcName = expression.ChildNodes[0].Token.Text;
-                    var funcParameters = new List<float>();
-                    if (expression.ChildNodes.Count > 1)
-                    {
-                        var functionArgsNode = expression.ChildNodes[1];
-                        for (var idx = 0; idx < functionArgsNode.ChildNodes.Count; idx++)
-                        {
-                            funcParameters.Add(EvaluateArithmeticExpression(functionArgsNode.ChildNodes[idx]).Value);
-                        }
-                    }
-                    return FunctionRegistry.Call(expression, funcName, funcParameters);
+                //case "FUNCTION_CALL":
+                //    var funcName = expression.ChildNodes[0].Token.Text;
+                //    var funcParameters = new List<float>();
+                //    if (expression.ChildNodes.Count > 1)
+                //    {
+                //        var functionArgsNode = expression.ChildNodes[1];
+                //        for (var idx = 0; idx < functionArgsNode.ChildNodes.Count; idx++)
+                //        {
+                //            funcParameters.Add(EvaluateArithmeticExpression(functionArgsNode.ChildNodes[idx]).Value);
+                //        }
+                //    }
+                //    return FunctionRegistry.Call(expression, funcName, funcParameters);
 
                 default:
                     return new ConstantEvaluation(Convert.ToSingle(expression.Token.Text));

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LogoSharp.Evaluations.Functions
 {
-    [Function("RANDOM")]
+    [Function("RANDOM", 1)]
     internal sealed class RandomFunction : FunctionEvaluation
     {
         private static readonly Random rnd = new Random(DateTime.UtcNow.Millisecond);
@@ -23,7 +23,5 @@ namespace LogoSharp.Evaluations.Functions
                 return rnd.Next(maximum);
             }
         }
-
-        public override bool ValidateParameters() => parameterValues.Count() == 1 && parameterValues.First() > 0;
     }
 }

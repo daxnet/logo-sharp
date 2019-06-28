@@ -14,7 +14,5 @@ namespace LogoSharp.Evaluations
         {
             this.parameterValues = parameterValues;
         }
-
-        public abstract bool ValidateParameters();
     }
 }

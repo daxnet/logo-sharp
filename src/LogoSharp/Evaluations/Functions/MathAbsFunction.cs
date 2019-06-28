@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LogoSharp.Evaluations.Functions
 {
-    [Function("ABS")]
+    [Function("ABS", 1)]
     internal sealed class MathAbsFunction : FunctionEvaluation
     {
         public MathAbsFunction(IEnumerable<float> parameterValues) : base(parameterValues)
@@ -14,10 +14,5 @@ namespace LogoSharp.Evaluations.Functions
         }
 
         public override float Value => Math.Abs(this.parameterValues.First());
-
-        public override bool ValidateParameters()
-        {
-            return this.parameterValues.Count() == 1;
-        }
     }
 }
