@@ -25,6 +25,7 @@ namespace LogoSharp
             // Non terminals
             // 10. Expressions
             var VARIABLE = new NonTerminal("VARIABLE");
+            var VARIABLE_REF = new NonTerminal("VARIABLE_REF");
             var EXPRESSION = new NonTerminal("EXPRESSION");
             var BINARY_OPERATOR = new NonTerminal("BINARY_OPERATOR");
             var BINARY_EXPRESSION = new NonTerminal("BINARY_EXPRESSION", typeof(BinaryOperationNode));
@@ -35,9 +36,19 @@ namespace LogoSharp
             // 15. Assignments
             var ASSIGNMENT = new NonTerminal("ASSIGNMENT");
 
+            // 18. Procedures
+            var PROCEDURE_DECLARE = new NonTerminal("PROCEDURE_DECLARE");
+            var PROCEDURE_BODY = new NonTerminal("PROCEDURE_BODY");
+            var PROCEDURE_END = new NonTerminal("PROCEDURE_END");
+            var PROCEDURE = new NonTerminal("PROCEDURE");
+            var PROCEDURE_CALL = new NonTerminal("PROCEDURE_CALL");
+            var PROCEDURE_CALL_ARGUMENTS = new NonTerminal("PROCEDURE_CALL_ARGUMENTS");
+            var PROCEDURE_ARGUMENT = new NonTerminal("PROCEDURE_ARGUMENT");
+            var PROCEDURE_ARGUMENTS = new NonTerminal("PROCEDURE_ARGUMENTS");
+
             // 20. Function calls
-            var FUNCTION_ARGS = new NonTerminal("FUNCTION_ARGS");
-            var FUNCTION_CALL = new NonTerminal("FUNCTION_CALL");
+            //var FUNCTION_ARGS = new NonTerminal("FUNCTION_ARGS");
+            //var FUNCTION_CALL = new NonTerminal("FUNCTION_CALL");
 
             // 50. Basic
             var LSB = new NonTerminal("LEFT_SQUARE_BRACKET");
@@ -91,12 +102,7 @@ namespace LogoSharp
             var COMMAND_LINE = new NonTerminal("COMMAND_LINE");
             var COMMAND = new NonTerminal("COMMAND");
 
-            // 400. Procedures
-            var PROCEDURE_DECLARE = new NonTerminal("PROCEDURE_DECLARE");
-            var PROCEDURE_BODY = new NonTerminal("PROCEDURE_BODY");
-            var PROCEDURE_END = new NonTerminal("PROCEDURE_END");
-            var PROCEDURE = new NonTerminal("PROCEDURE");
-            var PROCEDURE_CALL = new NonTerminal("PROCEDURE_CALL");
+            
 
             LSB.Rule = ToTerm("[");
             RSB.Rule = ToTerm("]");
@@ -108,7 +114,9 @@ namespace LogoSharp
 
             VARIABLE.Rule = "\"" + identifier;
             REP_COUNT_EXPRESSION.Rule = ToTerm("REPCOUNT");
-            EXPRESSION.Rule = decimal_number | VARIABLE | REP_COUNT_EXPRESSION | FUNCTION_CALL | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
+            VARIABLE_REF.Rule = ":" + identifier;
+
+            EXPRESSION.Rule = decimal_number | VARIABLE_REF | REP_COUNT_EXPRESSION /*| FUNCTION_CALL*/ | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
 
             UNARY_OPERATOR.Rule = ToTerm("-") | "+";
             UNARY_EXPRESSION.Rule = UNARY_OPERATOR + EXPRESSION;
@@ -116,8 +124,8 @@ namespace LogoSharp
             BINARY_OPERATOR.Rule = ToTerm("+") | "-" | "*" | "/" | "^";
             BINARY_EXPRESSION.Rule = EXPRESSION + BINARY_OPERATOR + EXPRESSION;
 
-            FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, ToTerm(",", "comma"), EXPRESSION);
-            FUNCTION_CALL.Rule = identifier + PreferShiftHere() + "(" + FUNCTION_ARGS + ")";
+            //FUNCTION_ARGS.Rule = MakeStarRule(FUNCTION_ARGS, EXPRESSION);
+            //FUNCTION_CALL.Rule = "call" + identifier + "(" + FUNCTION_ARGS + ")" + NewLine;
 
             ASSIGNMENT.Rule = "make" + VARIABLE + EXPRESSION;
 
@@ -161,12 +169,16 @@ namespace LogoSharp
             COMMAND_LINE.Rule = BASIC_COMMAND | FLOW_CONTROL_COMMAND | ASSIGNMENT | PROCEDURE_CALL;
             COMMAND.Rule = COMMAND_LINE | Empty + NewLine;
 
-            PROCEDURE_DECLARE.Rule = ToTerm("TO") + identifier + NewLine;
+            PROCEDURE_ARGUMENT.Rule = VARIABLE_REF;
+            PROCEDURE_ARGUMENTS.Rule = MakeStarRule(PROCEDURE_ARGUMENTS, PROCEDURE_ARGUMENT);
+
+            PROCEDURE_DECLARE.Rule = ToTerm("TO") + identifier + PROCEDURE_ARGUMENTS + NewLine;
             PROCEDURE_BODY.Rule = MakeStarRule(PROCEDURE_BODY, COMMAND);
             PROCEDURE_END.Rule = ToTerm("END") + NewLine;
             PROCEDURE.Rule = PROCEDURE_DECLARE + PROCEDURE_BODY + PROCEDURE_END;
 
-            PROCEDURE_CALL.Rule = identifier;
+            PROCEDURE_CALL_ARGUMENTS.Rule = MakeStarRule(PROCEDURE_CALL_ARGUMENTS, EXPRESSION);
+            PROCEDURE_CALL.Rule = identifier + PROCEDURE_CALL_ARGUMENTS;
 
             var COMMANDS = new NonTerminal("COMMANDS");
             COMMANDS.Rule = MakePlusRule(COMMANDS, COMMAND);
@@ -194,13 +206,15 @@ namespace LogoSharp
                 COMMAND_LINE,
                 COLOR_VALUE,
                 COLOR_VALUE_TUPLE,
+                PROCEDURE_ARGUMENT,
                 BASIC_COMMAND,
                 FLOW_CONTROL_COMMAND,
                 TUPLEARGS,
                 PROGRAM_BODY,
                 BINARY_OPERATOR, 
-                UNARY_OPERATOR,
-                FUNCTION_ARGS);
+                UNARY_OPERATOR
+                //FUNCTION_ARGS
+                );
 
             this.Root = PROGRAM;
         }

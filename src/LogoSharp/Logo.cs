@@ -129,9 +129,22 @@ namespace LogoSharp
             switch (expression.Term.Name)
             {
                 case "EXPRESSION":
-                    return EvaluateArithmeticExpression(expression.ChildNodes[0]);
+                    if (expression.ChildNodes.Count == 1)
+                    {
+                        return EvaluateArithmeticExpression(expression.ChildNodes[0]);
+                    }
+                    else if (expression.ChildNodes.Count == 3 &&
+                        expression.ChildNodes[0].Token.Text == "(" &&
+                        expression.ChildNodes[2].Token.Text == ")")
+                    {
+                        return EvaluateArithmeticExpression(expression.ChildNodes[1]);
+                    }
+                    else
+                    {
+                        throw new RuntimeException($"Invalid expression at: {expression.Span.Location}");
+                    }
 
-                case "VARIABLE":
+                case "VARIABLE_REF":
                     var variableName = expression.ChildNodes[1].Token.Text;
                     if (!CurrentProcedureScope.Exists(variableName))
                     {
@@ -370,6 +383,9 @@ namespace LogoSharp
                         this.ParseTree(child);
                     }
                     break;
+                case "PROCEDURE_CALL":
+                    this.ParseProcedureCall(node);
+                    break;
                 case "DRAWING_COMMAND":
                     this.ParseDrawingCommand(node);
                     break;
@@ -385,26 +401,51 @@ namespace LogoSharp
                 case "ASSIGNMENT":
                     this.ParseAssignment(node);
                     break;
-                case "PROCEDURE_CALL":
-                    this.ParseProcedureCall(node);
-                    break;
             }
         }
 
         private void ParseProcedure(ParseTreeNode procedureNode)
         {
             var name = procedureNode.ChildNodes[0].ChildNodes[1].Token.Text;
+            var argumentVariableNodes = procedureNode.ChildNodes[0].ChildNodes[2].ChildNodes;
+            var arguments = new List<string>();
+            foreach(var argumentVariableNode in argumentVariableNodes)
+            {
+                arguments.Add(argumentVariableNode.ChildNodes[1].Token.Text);
+            }
+
             var bodyNode = procedureNode.ChildNodes[1];
-            procedures.Add(new Procedure(name, bodyNode));
+            procedures.Add(new Procedure(name, arguments, bodyNode));
         }
 
         private void ParseProcedureCall(ParseTreeNode procedureNode)
         {
             var callingProcedureName = procedureNode.ChildNodes[0].Token.Text;
+            var callingProcedureArguments = new List<object>();
+            foreach (var callingProcedureArgumentNode in procedureNode.ChildNodes[1].ChildNodes)
+            {
+                if (callingProcedureArgumentNode.Term.Name == "EXPRESSION")
+                {
+                    callingProcedureArguments.Add(EvaluateArithmeticExpression(callingProcedureArgumentNode).Value);
+                }
+            }
+
             var procedure = procedures.FirstOrDefault(x => string.Equals(callingProcedureName, x.Name, StringComparison.InvariantCultureIgnoreCase));
+            
             if (procedure != null)
             {
-                procedureScopes.Push(new ProcedureScope(callingProcedureName));
+                if (callingProcedureArguments.Count != procedure.Arguments.Count)
+                {
+                    throw new RuntimeException($"Procedure call argument count mismatch.");
+                }
+
+                var procedureScope = new ProcedureScope(callingProcedureName);
+                for (var idx = 0; idx < procedure.Arguments.Count; idx++)
+                {
+                    procedureScope[procedure.Arguments[idx]] = callingProcedureArguments[idx];
+                }
+
+                procedureScopes.Push(procedureScope);
                 ParseTree(procedure.Body);
                 procedureScopes.Pop();
             }

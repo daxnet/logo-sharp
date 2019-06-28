@@ -14,10 +14,11 @@ namespace LogoSharp
     {
         #region Public Constructors
 
-        public Procedure(string name, ParseTreeNode body)
+        public Procedure(string name, IEnumerable<string> arguments, ParseTreeNode body)
         {
             this.Name = name;
             this.Body = body;
+            this.Arguments = new List<string>(arguments);
         }
 
         #endregion Public Constructors
@@ -26,6 +27,8 @@ namespace LogoSharp
 
         public ParseTreeNode Body { get; }
         public string Name { get; }
+
+        public List<string> Arguments { get; }
 
         #endregion Public Properties
 
