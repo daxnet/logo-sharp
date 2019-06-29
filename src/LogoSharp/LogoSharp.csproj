@@ -44,18 +44,14 @@
     <Compile Include="Evaluations\BinaryOperation.cs" />
     <Compile Include="Evaluations\ConstantEvaluation.cs" />
     <Compile Include="Evaluations\Evaluation.cs" />
-    <Compile Include="Evaluations\FunctionEvaluation.cs" />
-    <Compile Include="Evaluations\Functions\FunctionAttribute.cs" />
-    <Compile Include="Evaluations\Functions\FunctionRegistry.cs" />
-    <Compile Include="Evaluations\Functions\MathAbsFunction.cs" />
-    <Compile Include="Evaluations\Functions\MathCosFunction.cs" />
-    <Compile Include="Evaluations\Functions\MathPiFunction.cs" />
-    <Compile Include="Evaluations\Functions\MathSinFunction.cs" />
-    <Compile Include="Evaluations\Functions\RandomFunction.cs" />
     <Compile Include="EventArguments\BackwardEventArgs.cs" />
     <Compile Include="EventArguments\DelayEventArgs.cs" />
     <Compile Include="EventArguments\ForwardEventArgs.cs" />
     <Compile Include="EventArguments\PenColorEventArgs.cs" />
+    <Compile Include="Functions\Function.cs" />
+    <Compile Include="Functions\RandomFunction.cs" />
+    <Compile Include="Functions\SqrtFunction.cs" />
+    <Compile Include="IProcedure.cs" />
     <Compile Include="Logo.cs" />
     <Compile Include="LogoGrammar.cs" />
     <Compile Include="ParsingError.cs" />
@@ -83,5 +79,6 @@
       <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,8 +1,8 @@
 ﻿using Irony;
 using Irony.Parsing;
 using LogoSharp.Evaluations;
-using LogoSharp.Evaluations.Functions;
 using LogoSharp.EventArguments;
+using LogoSharp.Functions;
 using LogoSharp.Scopes;
 using System;
 using System.Collections.Generic;
@@ -14,13 +14,9 @@ namespace LogoSharp
 {
     public sealed class Logo
     {
+
         #region Private Fields
 
-        private static readonly Stack<ProcedureScope> procedureScopes = new Stack<ProcedureScope>();
-        private static readonly Stack<RepeatScope> repeatScopes = new Stack<RepeatScope>();
-        private static readonly List<Procedure> procedures = new List<Procedure>();
-        private static readonly LanguageData language = new LanguageData(new LogoGrammar());
-        private static readonly Parser parser = new Parser(language);
         private static readonly Dictionary<int, Tuple<int, int, int>> colorTable = new Dictionary<int, Tuple<int, int, int>>
         {
             { 0, new Tuple<int, int, int>(0, 0, 0) },
@@ -40,6 +36,12 @@ namespace LogoSharp
             { 14, new Tuple<int, int, int>(255, 163, 0) },
             { 15, new Tuple<int, int, int>(183, 183, 183) }
         };
+
+        private static readonly LanguageData language = new LanguageData(new LogoGrammar());
+        private static readonly Parser parser = new Parser(language);
+        private static readonly List<IProcedure> procedures = new List<IProcedure>();
+        private static readonly Stack<ProcedureScope> procedureScopes = new Stack<ProcedureScope>();
+        private static readonly Stack<RepeatScope> repeatScopes = new Stack<RepeatScope>();
 
         #endregion Private Fields
 
@@ -71,12 +73,30 @@ namespace LogoSharp
 
         #endregion Public Events
 
+        #region Internal Properties
+
+        internal ProcedureScope CurrentProcedureScope => procedureScopes.Peek();
+
+        #endregion Internal Properties
+
+        #region Private Properties
+
+        private RepeatScope CurrentRepeatScope => repeatScopes.Count > 0 ? repeatScopes.Peek() : null;
+
+        #endregion Private Properties
+
         #region Public Methods
 
         public void Execute(string source)
         {
             procedureScopes.Clear();
             procedures.Clear();
+
+            procedures.AddRange(new IProcedure []
+            {
+                new SqrtFunction(),
+                new RandomFunction()
+            });
 
             procedureScopes.Push(new ProcedureScope("Root"));
 
@@ -99,30 +119,53 @@ namespace LogoSharp
 
         public void OnShowTurtle(EventArgs e) => this.ShowTurtle?.Invoke(this, e);
 
-        public void ParseBasicControlCommand(ParseTreeNode node)
+        #endregion Public Methods
+
+        #region Internal Methods
+
+        internal void ParseTree(ParseTreeNode node)
         {
-            var commandNode = node.ChildNodes[0];
-            switch (commandNode.Term.Name)
+            switch (node.Term.Name)
             {
-                case "HOME":
-                    this.OnGoHome(EventArgs.Empty);
+                case "PROGRAM":
+                    foreach (var child in node.ChildNodes)
+                    {
+                        this.ParseTree(child);
+                    }
                     break;
-                case "SHOWTURTLE":
-                    this.OnShowTurtle(EventArgs.Empty);
+                case "PROCEDURE":
+                    this.ParseProcedure(node);
                     break;
-                case "HIDETURTLE":
-                    this.OnHideTurtle(EventArgs.Empty);
+                case "PROCEDURE_BODY":
+                    foreach (var child in node.ChildNodes)
+                    {
+                        this.ParseTree(child);
+                    }
+                    break;
+                case "PROCEDURE_CALL":
+                    this.ParseProcedureCall(node);
+                    break;
+                case "DRAWING_COMMAND":
+                    this.ParseDrawingCommand(node);
+                    break;
+                case "BASIC_CONTROL_COMMAND":
+                    this.ParseBasicControlCommand(node);
+                    break;
+                case "PEN_COMMAND":
+                    this.ParsePenCommand(node);
+                    break;
+                case "REPEAT_COMMAND":
+                    this.ParseRepeatCommand(node);
+                    break;
+                case "ASSIGNMENT":
+                    this.ParseAssignment(node);
                     break;
             }
         }
 
-        #endregion Public Methods
+        #endregion Internal Methods
 
         #region Private Methods
-
-        private ProcedureScope CurrentProcedureScope => procedureScopes.Peek();
-
-        private RepeatScope CurrentRepeatScope => repeatScopes.Count > 0 ? repeatScopes.Peek() : null;
 
         private Evaluation EvaluateArithmeticExpression(ParseTreeNode expression)
         {
@@ -184,21 +227,50 @@ namespace LogoSharp
                     }
                     throw new ParsingException("Variable repCount doesn't have a valid value.", new[] { ParsingError.FromParseTreeNode(expression, "Reference to repCount variable is not in a valid REPEAT scope.") });
 
-                //case "FUNCTION_CALL":
-                //    var funcName = expression.ChildNodes[0].Token.Text;
-                //    var funcParameters = new List<float>();
-                //    if (expression.ChildNodes.Count > 1)
-                //    {
-                //        var functionArgsNode = expression.ChildNodes[1];
-                //        for (var idx = 0; idx < functionArgsNode.ChildNodes.Count; idx++)
-                //        {
-                //            funcParameters.Add(EvaluateArithmeticExpression(functionArgsNode.ChildNodes[idx]).Value);
-                //        }
-                //    }
-                //    return FunctionRegistry.Call(expression, funcName, funcParameters);
+                case "PROCEDURE_CALL":
+                    var val = ExecuteProcedureCall(expression);
+                    return new ConstantEvaluation(Convert.ToSingle(val));
 
                 default:
                     return new ConstantEvaluation(Convert.ToSingle(expression.Token.Text));
+            }
+        }
+
+        private object ExecuteProcedureCall(ParseTreeNode procedureCallNode)
+        {
+            var callingProcedureName = procedureCallNode.ChildNodes[0].Token.Text;
+            var callingProcedureArguments = new List<object>();
+            foreach (var callingProcedureArgumentNode in procedureCallNode.ChildNodes[1].ChildNodes)
+            {
+                if (callingProcedureArgumentNode.Term.Name == "EXPRESSION")
+                {
+                    callingProcedureArguments.Add(EvaluateArithmeticExpression(callingProcedureArgumentNode).Value);
+                }
+            }
+
+            var procedure = procedures.FirstOrDefault(x => string.Equals(callingProcedureName, x.Name, StringComparison.InvariantCultureIgnoreCase));
+
+            if (procedure != null)
+            {
+                if (callingProcedureArguments.Count != procedure.Arguments.Count)
+                {
+                    throw new RuntimeException($"Procedure call argument count mismatch.");
+                }
+
+                var procedureScope = new ProcedureScope(callingProcedureName);
+                for (var idx = 0; idx < procedure.Arguments.Count; idx++)
+                {
+                    procedureScope[procedure.Arguments[idx]] = callingProcedureArguments[idx];
+                }
+
+                procedureScopes.Push(procedureScope);
+                procedure.Invoke(this, out var result);
+                procedureScopes.Pop();
+                return result;
+            }
+            else
+            {
+                throw new RuntimeException($"The calling procedure {callingProcedureName} is not defined.");
             }
         }
 
@@ -260,6 +332,22 @@ namespace LogoSharp
             CurrentProcedureScope[variable] = expression.Value;
         }
 
+        private void ParseBasicControlCommand(ParseTreeNode node)
+        {
+            var commandNode = node.ChildNodes[0];
+            switch (commandNode.Term.Name)
+            {
+                case "HOME":
+                    this.OnGoHome(EventArgs.Empty);
+                    break;
+                case "SHOWTURTLE":
+                    this.OnShowTurtle(EventArgs.Empty);
+                    break;
+                case "HIDETURTLE":
+                    this.OnHideTurtle(EventArgs.Empty);
+                    break;
+            }
+        }
         private void ParseDrawingCommand(ParseTreeNode node)
         {
             var commandNode = node.ChildNodes[0];
@@ -342,6 +430,21 @@ namespace LogoSharp
             }
         }
 
+        private void ParseProcedure(ParseTreeNode procedureNode)
+        {
+            var name = procedureNode.ChildNodes[0].ChildNodes[1].Token.Text;
+            var argumentVariableNodes = procedureNode.ChildNodes[0].ChildNodes[2].ChildNodes;
+            var arguments = new List<string>();
+            foreach (var argumentVariableNode in argumentVariableNodes)
+            {
+                arguments.Add(argumentVariableNode.ChildNodes[1].Token.Text);
+            }
+
+            var bodyNode = procedureNode.ChildNodes[1];
+            procedures.Add(new Procedure(name, arguments, bodyNode));
+        }
+        private void ParseProcedureCall(ParseTreeNode procedureCallNode) => ExecuteProcedureCall(procedureCallNode);
+
         private void ParseRepeatCommand(ParseTreeNode repeatNode)
         {
             if (repeatNode.ChildNodes[2]?.ChildNodes?.Count == 0)
@@ -362,98 +465,6 @@ namespace LogoSharp
 
             repeatScopes.Pop();
         }
-
-        private void ParseTree(ParseTreeNode node)
-        {
-            switch (node.Term.Name)
-            {
-                case "PROGRAM":
-                    foreach (var child in node.ChildNodes)
-                    {
-                        this.ParseTree(child);
-                    }
-                    break;
-                case "PROCEDURE":
-                    this.ParseProcedure(node);
-                    break;
-                case "PROCEDURE_BODY":
-                    foreach (var child in node.ChildNodes)
-                    {
-                        this.ParseTree(child);
-                    }
-                    break;
-                case "PROCEDURE_CALL":
-                    this.ParseProcedureCall(node);
-                    break;
-                case "DRAWING_COMMAND":
-                    this.ParseDrawingCommand(node);
-                    break;
-                case "BASIC_CONTROL_COMMAND":
-                    this.ParseBasicControlCommand(node);
-                    break;
-                case "PEN_COMMAND":
-                    this.ParsePenCommand(node);
-                    break;
-                case "REPEAT_COMMAND":
-                    this.ParseRepeatCommand(node);
-                    break;
-                case "ASSIGNMENT":
-                    this.ParseAssignment(node);
-                    break;
-            }
-        }
-
-        private void ParseProcedure(ParseTreeNode procedureNode)
-        {
-            var name = procedureNode.ChildNodes[0].ChildNodes[1].Token.Text;
-            var argumentVariableNodes = procedureNode.ChildNodes[0].ChildNodes[2].ChildNodes;
-            var arguments = new List<string>();
-            foreach(var argumentVariableNode in argumentVariableNodes)
-            {
-                arguments.Add(argumentVariableNode.ChildNodes[1].Token.Text);
-            }
-
-            var bodyNode = procedureNode.ChildNodes[1];
-            procedures.Add(new Procedure(name, arguments, bodyNode));
-        }
-
-        private void ParseProcedureCall(ParseTreeNode procedureNode)
-        {
-            var callingProcedureName = procedureNode.ChildNodes[0].Token.Text;
-            var callingProcedureArguments = new List<object>();
-            foreach (var callingProcedureArgumentNode in procedureNode.ChildNodes[1].ChildNodes)
-            {
-                if (callingProcedureArgumentNode.Term.Name == "EXPRESSION")
-                {
-                    callingProcedureArguments.Add(EvaluateArithmeticExpression(callingProcedureArgumentNode).Value);
-                }
-            }
-
-            var procedure = procedures.FirstOrDefault(x => string.Equals(callingProcedureName, x.Name, StringComparison.InvariantCultureIgnoreCase));
-            
-            if (procedure != null)
-            {
-                if (callingProcedureArguments.Count != procedure.Arguments.Count)
-                {
-                    throw new RuntimeException($"Procedure call argument count mismatch.");
-                }
-
-                var procedureScope = new ProcedureScope(callingProcedureName);
-                for (var idx = 0; idx < procedure.Arguments.Count; idx++)
-                {
-                    procedureScope[procedure.Arguments[idx]] = callingProcedureArguments[idx];
-                }
-
-                procedureScopes.Push(procedureScope);
-                ParseTree(procedure.Body);
-                procedureScopes.Pop();
-            }
-            else
-            {
-                throw new RuntimeException($"The calling procedure {callingProcedureName} is not defined.");
-            }
-        }
-
         private void ParseTupleValues(ParseTreeNode tupleNode, List<float> result)
         {
             foreach (var child in tupleNode.ChildNodes)
@@ -463,5 +474,6 @@ namespace LogoSharp
         }
 
         #endregion Private Methods
+
     }
 }

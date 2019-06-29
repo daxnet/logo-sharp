@@ -10,8 +10,6 @@ namespace LogoSharp
         public LogoGrammar()
             : base(false)
         {
-            // LanguageFlags |= LanguageFlags.NewLineBeforeEOF;
-
             // Literals
             var decimal_number = new NumberLiteral("DECIMAL")
             {
@@ -102,8 +100,6 @@ namespace LogoSharp
             var COMMAND_LINE = new NonTerminal("COMMAND_LINE");
             var COMMAND = new NonTerminal("COMMAND");
 
-            
-
             LSB.Rule = ToTerm("[");
             RSB.Rule = ToTerm("]");
             LPS.Rule = ToTerm("(");
@@ -113,10 +109,16 @@ namespace LogoSharp
             TUPLEARGS.Rule = LSB + TUPLE + RSB;
 
             VARIABLE.Rule = "\"" + identifier;
-            REP_COUNT_EXPRESSION.Rule = ToTerm("REPCOUNT");
             VARIABLE_REF.Rule = ":" + identifier;
 
-            EXPRESSION.Rule = decimal_number | VARIABLE_REF | REP_COUNT_EXPRESSION | BINARY_EXPRESSION | "(" + EXPRESSION + ")" | UNARY_EXPRESSION;
+            REP_COUNT_EXPRESSION.Rule = ToTerm("REPCOUNT");
+
+            EXPRESSION.Rule = decimal_number |
+                VARIABLE_REF | PROCEDURE_CALL |
+                REP_COUNT_EXPRESSION |
+                BINARY_EXPRESSION |
+                "(" + EXPRESSION + ")" |
+                UNARY_EXPRESSION;
 
             UNARY_OPERATOR.Rule = ToTerm("-") | "+";
             UNARY_EXPRESSION.Rule = UNARY_OPERATOR + EXPRESSION;
