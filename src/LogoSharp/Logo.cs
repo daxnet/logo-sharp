@@ -227,7 +227,7 @@ namespace LogoSharp
                     }
                     throw new ParsingException("Variable repCount doesn't have a valid value.", new[] { ParsingError.FromParseTreeNode(expression, "Reference to repCount variable is not in a valid REPEAT scope.") });
 
-                case "PROCEDURE_CALL":
+                case "FUNCTION_CALL":
                     var val = ExecuteProcedureCall(expression);
                     return new ConstantEvaluation(Convert.ToSingle(val));
 
@@ -238,25 +238,37 @@ namespace LogoSharp
 
         private object ExecuteProcedureCall(ParseTreeNode procedureCallNode)
         {
-            var hasArguments = procedureCallNode.ChildNodes.Count > 1;
+            var isFunction = string.Equals(procedureCallNode.Term.Name, "FUNCTION_CALL", StringComparison.InvariantCultureIgnoreCase);
 
-            var callingProcedureName = hasArguments ?
-                procedureCallNode.ChildNodes[1].Token.Text :
-                procedureCallNode.ChildNodes[0].Token.Text;
+            
+            var procedureName = string.Empty;
+            ParseTreeNodeList argumentNodes = null;
 
+            if (isFunction)
+            {
+                procedureName = procedureCallNode.ChildNodes[1].Token.Text;
+                argumentNodes = procedureCallNode.ChildNodes[2].ChildNodes;
+            }
+            else
+            {
+                procedureName = procedureCallNode.ChildNodes[0].Token.Text;
+                argumentNodes = procedureCallNode.ChildNodes[1].ChildNodes;
+            }
+
+            var hasArguments = argumentNodes.Count > 0;
             var callingProcedureArguments = new List<object>();
             if (hasArguments)
             {
-                foreach (var callingProcedureArgumentNode in procedureCallNode.ChildNodes[2].ChildNodes)
+                foreach (var argumentNode in argumentNodes)
                 {
-                    if (callingProcedureArgumentNode.Term.Name == "EXPRESSION")
+                    if (argumentNode.Term.Name == "EXPRESSION")
                     {
-                        callingProcedureArguments.Add(EvaluateArithmeticExpression(callingProcedureArgumentNode).Value);
+                        callingProcedureArguments.Add(EvaluateArithmeticExpression(argumentNode).Value);
                     }
                 }
             }
 
-            var procedure = procedures.FirstOrDefault(x => string.Equals(callingProcedureName, x.Name, StringComparison.InvariantCultureIgnoreCase));
+            var procedure = procedures.FirstOrDefault(x => string.Equals(procedureName, x.Name, StringComparison.InvariantCultureIgnoreCase));
 
             if (procedure != null)
             {
@@ -265,7 +277,7 @@ namespace LogoSharp
                     throw new RuntimeException($"Procedure call argument count mismatch.");
                 }
 
-                var procedureScope = new ProcedureScope(callingProcedureName);
+                var procedureScope = new ProcedureScope(procedureName);
                 for (var idx = 0; idx < procedure.Arguments.Count; idx++)
                 {
                     procedureScope[procedure.Arguments[idx]] = callingProcedureArguments[idx];
@@ -278,7 +290,7 @@ namespace LogoSharp
             }
             else
             {
-                throw new RuntimeException($"The calling procedure {callingProcedureName} is not defined.");
+                throw new RuntimeException($"The calling procedure {procedureName} is not defined.");
             }
         }
 

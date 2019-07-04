@@ -48,6 +48,10 @@ namespace LogoSharp
             var PROCEDURE_ARGUMENT = new NonTerminal("PROCEDURE_ARGUMENT");
             var PROCEDURE_ARGUMENTS = new NonTerminal("PROCEDURE_ARGUMENTS");
 
+            // 30. Functions
+            var FUNCTION_CALL = new NonTerminal("FUNCTION_CALL");
+            var FUNCTION_CALL_ARGUMENTS = new NonTerminal("FUNCTION_CALL_ARGUMENTS");
+
             // 50. Basic
             var LSB = new NonTerminal("LEFT_SQUARE_BRACKET");
             var RSB = new NonTerminal("RIGHT_SQUARE_BRACKET");
@@ -114,7 +118,7 @@ namespace LogoSharp
             REP_COUNT_EXPRESSION.Rule = ToTerm("REPCOUNT");
 
             EXPRESSION.Rule = decimal_number |
-                VARIABLE_REF | PROCEDURE_CALL |
+                VARIABLE_REF | FUNCTION_CALL |
                 REP_COUNT_EXPRESSION |
                 BINARY_EXPRESSION |
                 "(" + EXPRESSION + ")" |
@@ -176,7 +180,10 @@ namespace LogoSharp
             PROCEDURE.Rule = PROCEDURE_DECLARE + PROCEDURE_BODY + PROCEDURE_END;
 
             PROCEDURE_CALL_ARGUMENTS.Rule = MakeStarRule(PROCEDURE_CALL_ARGUMENTS, EXPRESSION);
-            PROCEDURE_CALL.Rule = identifier | "{" + identifier  + PROCEDURE_CALL_ARGUMENTS + "}";
+            PROCEDURE_CALL.Rule = identifier  + PROCEDURE_CALL_ARGUMENTS;
+
+            FUNCTION_CALL_ARGUMENTS.Rule = MakeStarRule(FUNCTION_CALL_ARGUMENTS, EXPRESSION);
+            FUNCTION_CALL.Rule = "{" + identifier + FUNCTION_CALL_ARGUMENTS + "}";
 
             var COMMANDS = new NonTerminal("COMMANDS");
             COMMANDS.Rule = MakePlusRule(COMMANDS, COMMAND);
