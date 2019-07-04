@@ -176,7 +176,7 @@ namespace LogoSharp
             PROCEDURE.Rule = PROCEDURE_DECLARE + PROCEDURE_BODY + PROCEDURE_END;
 
             PROCEDURE_CALL_ARGUMENTS.Rule = MakeStarRule(PROCEDURE_CALL_ARGUMENTS, EXPRESSION);
-            PROCEDURE_CALL.Rule = identifier + PROCEDURE_CALL_ARGUMENTS;
+            PROCEDURE_CALL.Rule = identifier | "{" + identifier  + PROCEDURE_CALL_ARGUMENTS + "}";
 
             var COMMANDS = new NonTerminal("COMMANDS");
             COMMANDS.Rule = MakePlusRule(COMMANDS, COMMAND);
@@ -196,6 +196,7 @@ namespace LogoSharp
 
             RegisterBracePair("[", "]");
             RegisterBracePair("(", ")");
+            RegisterBracePair("{", "}");
 
             MarkPunctuation(LPS, RPS);
             MarkPunctuation(LSB, RSB);
@@ -211,7 +212,6 @@ namespace LogoSharp
                 PROGRAM_BODY,
                 BINARY_OPERATOR, 
                 UNARY_OPERATOR
-                //FUNCTION_ARGS
                 );
 
             this.Root = PROGRAM;

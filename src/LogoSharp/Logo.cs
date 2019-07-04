@@ -238,13 +238,21 @@ namespace LogoSharp
 
         private object ExecuteProcedureCall(ParseTreeNode procedureCallNode)
         {
-            var callingProcedureName = procedureCallNode.ChildNodes[0].Token.Text;
+            var hasArguments = procedureCallNode.ChildNodes.Count > 1;
+
+            var callingProcedureName = hasArguments ?
+                procedureCallNode.ChildNodes[1].Token.Text :
+                procedureCallNode.ChildNodes[0].Token.Text;
+
             var callingProcedureArguments = new List<object>();
-            foreach (var callingProcedureArgumentNode in procedureCallNode.ChildNodes[1].ChildNodes)
+            if (hasArguments)
             {
-                if (callingProcedureArgumentNode.Term.Name == "EXPRESSION")
+                foreach (var callingProcedureArgumentNode in procedureCallNode.ChildNodes[2].ChildNodes)
                 {
-                    callingProcedureArguments.Add(EvaluateArithmeticExpression(callingProcedureArgumentNode).Value);
+                    if (callingProcedureArgumentNode.Term.Name == "EXPRESSION")
+                    {
+                        callingProcedureArguments.Add(EvaluateArithmeticExpression(callingProcedureArgumentNode).Value);
+                    }
                 }
             }
 
