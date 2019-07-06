@@ -1,4 +1,4 @@
-# Logo Sharp
+# LogoSharp
 Logo programming language for managed world.
 
 [![Build status](https://dev.azure.com/sunnycoding/LogoSharp/_apis/build/status/LogoSharp%20Library%20Build%20Pipeline)](https://dev.azure.com/sunnycoding/LogoSharp/_build/latest?definitionId=6) [![NuGet Badge](https://buildstats.info/nuget/LogoSharp?includePreReleases=true)](https://www.nuget.org/packages/LogoSharp/)
