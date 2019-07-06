@@ -1,0 +1,8 @@
+to square :length
+  repeat 4 [ fd :length rt 90 ]
+end
+to randomcolor
+  pc {random 16}
+end
+clearscreen
+repeat 36 [ randomcolor square {random 200} rt 10 ]

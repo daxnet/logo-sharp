@@ -63,5 +63,11 @@
   <ItemGroup>
     <None Include="Resources\tortoise32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LogoSharp\LogoSharp.csproj">
+      <Project>{414a5f7c-ca92-4ca7-8753-de1dd140c3df}</Project>
+      <Name>LogoSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
