@@ -1,18 +1,27 @@
-﻿using Irony.Parsing;
-using System;
+﻿// ==============================================================================
+//  _      ____   _____  ____     _____ _    _          _____  _____
+// | |    / __ \ / ____|/ __ \   / ____| |  | |   /\   |  __ \|  __ \
+// | |   | |  | | |  __| |  | | | (___ | |__| |  /  \  | |__) | |__) |
+// | |   | |  | | | |_ | |  | |  \___ \|  __  | / /\ \ |  _  /|  ___/
+// | |___| |__| | |__| | |__| |  ____) | |  | |/ ____ \| | \ \| |
+// |______\____/ \_____|\____/  |_____/|_|  |_/_/    \_\_|  \_\_|
+//
+// Logo Sharp, Logo programming language for managed world.
+// Licensed under MIT license.
+// By daxnet, https://github.com/daxnet/logo-sharp
+// https://sunnycoding.cn
+// ==============================================================================
+
+using Irony.Parsing;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LogoSharp
 {
     /// <summary>
     /// Represents a procedure in the Logo programming language.
     /// </summary>
-    internal sealed class Procedure : IProcedure
+    internal sealed class Procedure : IProcedureOrFunction
     {
-
         #region Public Constructors
 
         public Procedure(string name, IEnumerable<string> arguments, ParseTreeNode body)
@@ -26,7 +35,7 @@ namespace LogoSharp
 
         #region Public Properties
 
-        public List<string> Arguments { get; }
+        public IEnumerable<string> Arguments { get; }
         public string Name { get; }
 
         #endregion Public Properties
@@ -59,6 +68,5 @@ namespace LogoSharp
         public override string ToString() => Name;
 
         #endregion Public Methods
-
     }
 }

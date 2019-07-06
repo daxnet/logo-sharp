@@ -1,4 +1,17 @@
-﻿using Irony;
+﻿// ==============================================================================
+//  _      ____   _____  ____     _____ _    _          _____  _____
+// | |    / __ \ / ____|/ __ \   / ____| |  | |   /\   |  __ \|  __ \
+// | |   | |  | | |  __| |  | | | (___ | |__| |  /  \  | |__) | |__) |
+// | |   | |  | | | |_ | |  | |  \___ \|  __  | / /\ \ |  _  /|  ___/
+// | |___| |__| | |__| | |__| |  ____) | |  | |/ ____ \| | \ \| |
+// |______\____/ \_____|\____/  |_____/|_|  |_/_/    \_\_|  \_\_|
+//
+// Logo Sharp, Logo programming language for managed world.
+// Licensed under MIT license.
+// By daxnet, https://github.com/daxnet/logo-sharp
+// https://sunnycoding.cn
+// ==============================================================================
+
 using Irony.Parsing;
 using LogoSharp.Evaluations;
 using LogoSharp.EventArguments;
@@ -7,14 +20,11 @@ using LogoSharp.Scopes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LogoSharp
 {
     public sealed class Logo
     {
-
         #region Private Fields
 
         private static readonly Dictionary<int, Tuple<int, int, int>> colorTable = new Dictionary<int, Tuple<int, int, int>>
@@ -39,7 +49,7 @@ namespace LogoSharp
 
         private static readonly LanguageData language = new LanguageData(new LogoGrammar());
         private static readonly Parser parser = new Parser(language);
-        private static readonly List<IProcedure> procedures = new List<IProcedure>();
+        private static readonly List<IProcedureOrFunction> procedures = new List<IProcedureOrFunction>();
         private static readonly Stack<ProcedureScope> procedureScopes = new Stack<ProcedureScope>();
         private static readonly Stack<RepeatScope> repeatScopes = new Stack<RepeatScope>();
 
@@ -92,7 +102,7 @@ namespace LogoSharp
             procedureScopes.Clear();
             procedures.Clear();
 
-            procedures.AddRange(new IProcedure []
+            procedures.AddRange(new IProcedureOrFunction[]
             {
                 new SqrtFunction(),
                 new RandomFunction()
@@ -133,30 +143,38 @@ namespace LogoSharp
                         this.ParseTree(child);
                     }
                     break;
+
                 case "PROCEDURE":
                     this.ParseProcedure(node);
                     break;
+
                 case "PROCEDURE_BODY":
                     foreach (var child in node.ChildNodes)
                     {
                         this.ParseTree(child);
                     }
                     break;
+
                 case "PROCEDURE_CALL":
                     this.ParseProcedureCall(node);
                     break;
+
                 case "DRAWING_COMMAND":
                     this.ParseDrawingCommand(node);
                     break;
+
                 case "BASIC_CONTROL_COMMAND":
                     this.ParseBasicControlCommand(node);
                     break;
+
                 case "PEN_COMMAND":
                     this.ParsePenCommand(node);
                     break;
+
                 case "REPEAT_COMMAND":
                     this.ParseRepeatCommand(node);
                     break;
+
                 case "ASSIGNMENT":
                     this.ParseAssignment(node);
                     break;
@@ -208,12 +226,15 @@ namespace LogoSharp
                         case "+":
                             binaryOperation = BinaryOperation.Add;
                             break;
+
                         case "-":
                             binaryOperation = BinaryOperation.Sub;
                             break;
+
                         case "*":
                             binaryOperation = BinaryOperation.Mul;
                             break;
+
                         case "/":
                             binaryOperation = BinaryOperation.Div;
                             break;
@@ -240,7 +261,6 @@ namespace LogoSharp
         {
             var isFunction = string.Equals(procedureCallNode.Term.Name, "FUNCTION_CALL", StringComparison.InvariantCultureIgnoreCase);
 
-            
             var procedureName = string.Empty;
             ParseTreeNodeList argumentNodes = null;
 
@@ -272,15 +292,15 @@ namespace LogoSharp
 
             if (procedure != null)
             {
-                if (callingProcedureArguments.Count != procedure.Arguments.Count)
+                if (callingProcedureArguments.Count != procedure.Arguments.Count())
                 {
                     throw new RuntimeException($"Procedure call argument count mismatch.");
                 }
 
                 var procedureScope = new ProcedureScope(procedureName);
-                for (var idx = 0; idx < procedure.Arguments.Count; idx++)
+                for (var idx = 0; idx < procedure.Arguments.Count(); idx++)
                 {
-                    procedureScope[procedure.Arguments[idx]] = callingProcedureArguments[idx];
+                    procedureScope[procedure.Arguments.ElementAt(idx)] = callingProcedureArguments[idx];
                 }
 
                 procedureScopes.Push(procedureScope);
@@ -360,14 +380,17 @@ namespace LogoSharp
                 case "HOME":
                     this.OnGoHome(EventArgs.Empty);
                     break;
+
                 case "SHOWTURTLE":
                     this.OnShowTurtle(EventArgs.Empty);
                     break;
+
                 case "HIDETURTLE":
                     this.OnHideTurtle(EventArgs.Empty);
                     break;
             }
         }
+
         private void ParseDrawingCommand(ParseTreeNode node)
         {
             var commandNode = node.ChildNodes[0];
@@ -384,22 +407,26 @@ namespace LogoSharp
                 case "LEFT":
                     this.OnTurnLeft(new TurnLeftEventArgs(evaluatedValue));
                     break;
+
                 case "RIGHT":
                     this.OnTurnRight(new TurnRightEventArgs(evaluatedValue));
                     break;
+
                 case "FORWARD":
                     this.OnForward(new ForwardEventArgs(evaluatedValue));
                     break;
+
                 case "BACKWARD":
                     this.OnBackward(new BackwardEventArgs(evaluatedValue));
                     break;
+
                 case "DELAY":
                     this.OnDelay(new DelayEventArgs(Convert.ToInt32(evaluatedValue)));
                     break;
+
                 case "DRAW":
                     this.OnClearScreen(EventArgs.Empty);
                     break;
-
             }
         }
 
@@ -411,9 +438,11 @@ namespace LogoSharp
                 case "PEN_UP":
                     this.OnPenUp(EventArgs.Empty);
                     break;
+
                 case "PEN_DOWN":
                     this.OnPenDown(EventArgs.Empty);
                     break;
+
                 case "SET_PEN_COLOR":
                     switch (commandNode.ChildNodes[1].Term.Name)
                     {
@@ -438,6 +467,7 @@ namespace LogoSharp
 
                             this.OnSetPenColor(new PenColorEventArgs(Convert.ToInt32(rgb[0]), Convert.ToInt32(rgb[1]), Convert.ToInt32(rgb[2])));
                             break;
+
                         case "EXPRESSION":
                             var evaluation = this.EvaluateArithmeticExpression(commandNode.ChildNodes[1]);
                             var colorIndex = Convert.ToInt32(evaluation.Value) % 16;
@@ -463,6 +493,7 @@ namespace LogoSharp
             var bodyNode = procedureNode.ChildNodes[1];
             procedures.Add(new Procedure(name, arguments, bodyNode));
         }
+
         private void ParseProcedureCall(ParseTreeNode procedureCallNode) => ExecuteProcedureCall(procedureCallNode);
 
         private void ParseRepeatCommand(ParseTreeNode repeatNode)
@@ -485,6 +516,7 @@ namespace LogoSharp
 
             repeatScopes.Pop();
         }
+
         private void ParseTupleValues(ParseTreeNode tupleNode, List<float> result)
         {
             foreach (var child in tupleNode.ChildNodes)
@@ -494,6 +526,5 @@ namespace LogoSharp
         }
 
         #endregion Private Methods
-
     }
 }

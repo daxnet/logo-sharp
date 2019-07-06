@@ -12,30 +12,41 @@
 // https://sunnycoding.cn
 // ==============================================================================
 
-namespace LogoSharp.Scopes
+using System.Collections.Generic;
+
+namespace LogoSharp
 {
     /// <summary>
-    /// Represents the scope for a REPEAT execution.
+    /// Represents that the implemented classes are procedures or functions
+    /// that take specific arguments and execute commands when they are called.
     /// </summary>
-    internal sealed class RepeatScope : Scope
+    internal interface IProcedureOrFunction
     {
-        #region Public Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <c>RepeatScope</c> class.
-        /// </summary>
-        /// <param name="name"></param>
-        public RepeatScope(string name) : base(name) { }
-
-        #endregion Public Constructors
 
         #region Public Properties
 
         /// <summary>
-        /// Gets or sets the current count of the REPEAT execution, starting from 1.
+        /// Gets a list of arguments.
         /// </summary>
-        public int RepCount { get; set; }
+        IEnumerable<string> Arguments { get; }
+
+        /// <summary>
+        /// Gets the name of the procedure or function.
+        /// </summary>
+        string Name { get; }
 
         #endregion Public Properties
+
+        #region Public Methods
+
+        /// <summary>
+        /// Invokes the procedure or function and returns results.
+        /// </summary>
+        /// <param name="logo">The <see cref="Logo"/> instance which provides execution contexts.</param>
+        /// <param name="result">The execution result.</param>
+        void Invoke(Logo logo, out object result);
+
+        #endregion Public Methods
+
     }
 }

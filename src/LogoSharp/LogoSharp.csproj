@@ -51,7 +51,7 @@
     <Compile Include="Functions\Function.cs" />
     <Compile Include="Functions\RandomFunction.cs" />
     <Compile Include="Functions\SqrtFunction.cs" />
-    <Compile Include="IProcedure.cs" />
+    <Compile Include="IProcedureOrFunction.cs" />
     <Compile Include="Logo.cs" />
     <Compile Include="LogoGrammar.cs" />
     <Compile Include="ParsingError.cs" />

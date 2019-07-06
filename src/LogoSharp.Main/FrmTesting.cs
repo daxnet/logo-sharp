@@ -157,6 +157,7 @@ namespace LogoSharp.Main
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
+            txtError.Clear();
             var sourceCode = txtSourceCode.Text;
 
             try
