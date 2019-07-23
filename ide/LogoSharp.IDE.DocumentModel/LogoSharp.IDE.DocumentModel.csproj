@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="CodeItem.cs" />
     <Compile Include="CommandItem.cs" />
+    <Compile Include="LogoSharpWorkspace.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
